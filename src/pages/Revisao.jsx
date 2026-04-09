@@ -40,10 +40,10 @@ export default function Revisao() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#05080f', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className="app-shell">
       <Sidebar />
 
-      <div style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
+      <div className="page-content">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
@@ -63,7 +63,7 @@ export default function Revisao() {
           marginBottom: '24px',
         }}>
           {/* Student Info */}
-          <div style={{ display: 'flex', gap: '32px', marginBottom: '24px' }}>
+          <div className="review-info">
             <div>
               <div style={{ color: '#7a8ba8', fontSize: '12px', fontWeight: '500', marginBottom: '4px', textTransform: 'uppercase' }}>
                 Aluno
@@ -150,13 +150,11 @@ export default function Revisao() {
               {erros.map((error, i) => (
                 <div
                   key={i}
+                  className="error-row"
                   style={{
                     padding: '12px 16px',
                     background: '#131b2e',
                     borderRadius: '8px',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
                   }}
                 >
                   <div>
@@ -183,7 +181,7 @@ export default function Revisao() {
         </div>
 
         {/* Action Buttons */}
-        <div style={{ display: 'flex', gap: '16px' }}>
+        <div className="review-actions">
           <button
             onClick={() => navigate('/correcao')}
             style={{

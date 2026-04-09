@@ -1,0 +1,273 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #05080f;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.sidebar-shell {
+  width: 100%;
+  min-height: auto;
+  background: #0a0f1a;
+  border-right: none;
+  border-bottom: 1px solid #1e2a3a;
+  padding: 16px 12px;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-brand {
+  margin-bottom: 16px;
+  padding-left: 8px;
+}
+
+.sidebar-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.menu-toggle {
+  width: 44px;
+  height: 44px;
+  border: 1px solid #1e2a3a;
+  background: #111827;
+  border-radius: 8px;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.menu-toggle span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.sidebar-menu-area {
+  display: none;
+}
+
+.sidebar-menu-area.open {
+  display: flex;
+  flex-direction: column;
+  margin-top: 10px;
+}
+
+.sidebar-nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+  flex: 1;
+}
+
+.sidebar-item {
+  min-height: 44px;
+}
+
+.sidebar-logout {
+  margin-top: 12px;
+  padding-top: 14px;
+}
+
+.page-content {
+  flex: 1;
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.table-wrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table-wrap table {
+  min-width: 680px;
+}
+
+.split-columns {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.review-info {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.error-row {
+  display: block;
+}
+
+.review-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.login-shell {
+  min-height: 100vh;
+  background: #05080f;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 16px;
+}
+
+.login-card {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+}
+
+.login-panel {
+  padding: 28px 20px;
+}
+
+.login-metrics {
+  display: flex;
+  gap: 16px;
+  margin-top: 24px;
+  justify-content: center;
+}
+
+@media (min-width: 768px) {
+  .sidebar-nav {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .review-info {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .review-actions {
+    flex-direction: row;
+  }
+
+  .error-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .login-shell {
+    align-items: center;
+    padding: 24px;
+  }
+
+  .login-card {
+    min-height: 500px;
+    max-width: 900px;
+  }
+
+  .login-panel {
+    padding: 40px 32px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .app-shell {
+    flex-direction: row;
+  }
+
+  .sidebar-shell {
+    width: 240px;
+    min-height: 100vh;
+    border-right: 1px solid #1e2a3a;
+    border-bottom: none;
+    padding: 24px 16px;
+  }
+
+  .sidebar-brand {
+    margin-bottom: 40px;
+    padding-left: 12px;
+  }
+
+  .menu-toggle {
+    display: none;
+  }
+
+  .sidebar-menu-area {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+  }
+
+  .sidebar-nav {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+
+  .sidebar-logout {
+    margin-top: 16px;
+    padding-top: 20px;
+  }
+
+  .page-content {
+    padding: 32px 40px;
+  }
+
+  .stats-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
+  }
+
+  .split-columns {
+    flex-direction: row;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .login-card {
+    flex-direction: row;
+  }
+
+  .login-panel {
+    padding: 48px 40px;
+  }
+
+  .login-metrics {
+    gap: 24px;
+    margin-top: 32px;
+  }
+}

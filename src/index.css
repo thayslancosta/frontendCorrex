@@ -1,17 +1,16 @@
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #05080f; color: #cbd5e1; min-height: 100vh; }
-}
 
 body {
   margin: 0;
 }
 
 #root {
-  width: 1126px;
+  width: 100%;
   max-width: 100%;
-  margin: 0 auto;
-  text-align: center;
-  border-inline: 1px solid var(--border);
+  margin: 0;
+  text-align: initial;
+  border-inline: none;
   min-height: 100svh;
   display: flex;
   flex-direction: column;

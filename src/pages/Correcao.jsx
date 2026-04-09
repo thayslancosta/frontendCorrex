@@ -32,10 +32,10 @@ export default function Correcao() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#05080f', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className="app-shell">
       <Sidebar />
 
-      <div style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
+      <div className="page-content">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
@@ -47,7 +47,7 @@ export default function Correcao() {
         </div>
 
         {/* Two Columns */}
-        <div style={{ display: 'flex', gap: '24px', marginBottom: '32px' }}>
+        <div className="split-columns">
           {/* Left Column - Original Text */}
           <div style={{ flex: 1 }}>
             <div style={{

@@ -48,10 +48,10 @@ export default function Upload() {
   };
 
   return (
-    <div style={{ display: 'flex', minHeight: '100vh', background: '#05080f', fontFamily: "'Segoe UI', sans-serif" }}>
+    <div className="app-shell">
       <Sidebar />
 
-      <div style={{ flex: 1, padding: '32px 40px', overflowY: 'auto' }}>
+      <div className="page-content">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
           <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
@@ -63,7 +63,7 @@ export default function Upload() {
         </div>
 
         {/* Selects */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', marginBottom: '32px' }}>
+        <div className="form-grid">
           <div>
             <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
               Turma

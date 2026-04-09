@@ -12,27 +12,12 @@ export default function Login() {
   };
 
   return (
-    <div style={{
-      minHeight: '100vh',
-      background: '#05080f',
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontFamily: "'Segoe UI', sans-serif",
-    }}>
-      <div style={{
-        display: 'flex',
-        width: '900px',
-        minHeight: '500px',
-        borderRadius: '16px',
-        overflow: 'hidden',
-        boxShadow: '0 20px 60px rgba(0,0,0,0.5)',
-      }}>
+    <div className="login-shell">
+      <div className="login-card">
         {/* Lado esquerdo - Formulário */}
-        <div style={{
+        <div className="login-panel" style={{
           flex: 1,
           background: '#0a0f1a',
-          padding: '48px 40px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -136,10 +121,9 @@ export default function Login() {
         </div>
 
         {/* Lado direito - Painel azul */}
-        <div style={{
+        <div className="login-panel" style={{
           flex: 1,
           background: 'linear-gradient(135deg, #0c1a3d, #142952)',
-          padding: '48px 40px',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
@@ -176,11 +160,7 @@ export default function Login() {
             Envie redações dos seus alunos e receba correções detalhadas com sugestões de melhoria em segundos.
           </p>
 
-          <div style={{
-            display: 'flex',
-            gap: '24px',
-            marginTop: '32px',
-          }}>
+          <div className="login-metrics">
             {[
               { num: '500+', label: 'Correções' },
               { num: '50+', label: 'Professores' },
