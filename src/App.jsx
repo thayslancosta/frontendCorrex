@@ -4,6 +4,9 @@ import Dashboard from './pages/Dashboard'
 import Upload from './pages/Upload'
 import Correcao from './pages/Correcao'
 import Revisao from './pages/Revisao'
+import Turmas from './pages/Turmas'
+import Alunos from './pages/Alunos'
+import Criterios from './pages/Criterios'
 
 function App() {
   return (
@@ -15,6 +18,9 @@ function App() {
         <Route path="/upload" element={<Upload />} />
         <Route path="/correcao" element={<Correcao />} />
         <Route path="/revisao" element={<Revisao />} />
+        <Route path="/turmas" element={<Turmas />} />
+        <Route path="/alunos" element={<Alunos />} />
+        <Route path="/criterios" element={<Criterios />} />
       </Routes>
     </BrowserRouter>
   )

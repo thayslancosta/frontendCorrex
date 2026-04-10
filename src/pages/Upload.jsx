@@ -2,49 +2,84 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
+const ROYAL = '#1a3a7c';
+const BORDER = '#1a2540';
+const MUTED = '#6b7a99';
+const BG_CARD = '#0a0f1a';
+const BG_INPUT = '#0d1424';
+
+const IconFile = () => (
+  <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
+    <path d="M9 4h12l8 8v20a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="#4a7cff" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M21 4v8h8" stroke="#4a7cff" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M18 20v-7M15 16l3-3 3 3" stroke="#4a7cff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconFileSmall = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <path d="M3 1h6l3 3v8a1 1 0 01-1 1H3a1 1 0 01-1-1V2a1 1 0 011-1z" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+    <path d="M9 1v3h3" stroke="currentColor" strokeWidth="1.2" strokeLinejoin="round" />
+  </svg>
+);
+
+const IconRemove = () => (
+  <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+    <path d="M2 2l10 10M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
 export default function Upload() {
   const navigate = useNavigate();
+  const [modoEntrada, setModoEntrada] = useState('arquivo');
   const [turma, setTurma] = useState('');
   const [idioma, setIdioma] = useState('');
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
+  const [nomeAluno, setNomeAluno] = useState('');
+  const [textoDigitado, setTextoDigitado] = useState('');
 
   const handleDrag = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === 'dragenter' || e.type === 'dragover') {
-      setDragActive(true);
-    } else if (e.type === 'dragleave') {
-      setDragActive(false);
-    }
+    setDragActive(e.type === 'dragenter' || e.type === 'dragover');
   };
 
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const newFiles = Array.from(e.dataTransfer.files).map((file) => ({
-        name: file.name,
-        size: (file.size / 1024).toFixed(1) + ' KB',
+    if (e.dataTransfer.files?.[0]) {
+      const newFiles = Array.from(e.dataTransfer.files).map((f) => ({
+        name: f.name,
+        size: (f.size / 1024).toFixed(1) + ' KB',
       }));
-      setFiles([...files, ...newFiles]);
+      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
   const handleFileSelect = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const newFiles = Array.from(e.target.files).map((file) => ({
-        name: file.name,
-        size: (file.size / 1024).toFixed(1) + ' KB',
+    if (e.target.files?.[0]) {
+      const newFiles = Array.from(e.target.files).map((f) => ({
+        name: f.name,
+        size: (f.size / 1024).toFixed(1) + ' KB',
       }));
-      setFiles([...files, ...newFiles]);
+      setFiles((prev) => [...prev, ...newFiles]);
     }
   };
 
-  const removeFile = (index) => {
-    setFiles(files.filter((_, i) => i !== index));
+  const removeFile = (index) => setFiles((prev) => prev.filter((_, i) => i !== index));
+
+  const selectStyle = {
+    width: '100%',
+    padding: '11px 14px',
+    background: BG_INPUT,
+    border: `1px solid ${BORDER}`,
+    borderRadius: '8px',
+    color: '#ffffff',
+    fontSize: '14px',
+    cursor: 'pointer',
+    outline: 'none',
   };
 
   return (
@@ -54,34 +89,21 @@ export default function Upload() {
       <div className="page-content">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
-            Nova Correção
+          <h1 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
+            Nova correção
           </h1>
-          <p style={{ color: '#7a8ba8', fontSize: '14px' }}>
+          <p style={{ color: MUTED, fontSize: '14px' }}>
             Envie redações para correção automática com IA
           </p>
         </div>
 
         {/* Selects */}
-        <div className="form-grid">
+        <div className="form-grid" style={{ marginBottom: '24px' }}>
           <div>
-            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
+            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
               Turma
             </label>
-            <select
-              value={turma}
-              onChange={(e) => setTurma(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: '#111827',
-                border: '1px solid #1e2a3a',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '14px',
-                cursor: 'pointer',
-              }}
-            >
+            <select value={turma} onChange={(e) => setTurma(e.target.value)} style={selectStyle}>
               <option value="">Selecione uma turma</option>
               <option value="en-a2">Inglês A2</option>
               <option value="en-b1">Inglês B1</option>
@@ -91,23 +113,10 @@ export default function Upload() {
           </div>
 
           <div>
-            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
-              Idioma da Redação
+            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+              Idioma da redação
             </label>
-            <select
-              value={idioma}
-              onChange={(e) => setIdioma(e.target.value)}
-              style={{
-                width: '100%',
-                padding: '12px 16px',
-                background: '#111827',
-                border: '1px solid #1e2a3a',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '14px',
-                cursor: 'pointer',
-              }}
-            >
+            <select value={idioma} onChange={(e) => setIdioma(e.target.value)} style={selectStyle}>
               <option value="">Selecione um idioma</option>
               <option value="en">Inglês</option>
               <option value="es">Espanhol</option>
@@ -116,24 +125,80 @@ export default function Upload() {
           </div>
         </div>
 
-        {/* Drag and Drop Area */}
+        {/* Tabs */}
+        <div style={{
+          display: 'flex',
+          gap: '0',
+          border: `1px solid ${BORDER}`,
+          borderRadius: '8px',
+          overflow: 'hidden',
+          marginBottom: '24px',
+          width: 'fit-content',
+        }}>
+          <button
+            onClick={() => setModoEntrada('arquivo')}
+            style={{
+              background: modoEntrada === 'arquivo' ? ROYAL : BG_CARD,
+              color: modoEntrada === 'arquivo' ? '#ffffff' : MUTED,
+              border: 'none',
+              padding: '10px 20px',
+              fontSize: '14px',
+              cursor: 'pointer',
+              transition: 'background 0.15s',
+              fontWeight: '500',
+            }}
+            onMouseEnter={(e) => {
+              if (modoEntrada !== 'arquivo') e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+            }}
+            onMouseLeave={(e) => {
+              if (modoEntrada !== 'arquivo') e.currentTarget.style.background = BG_CARD;
+            }}
+          >
+            Enviar arquivo
+          </button>
+          <button
+            onClick={() => setModoEntrada('texto')}
+            style={{
+              background: modoEntrada === 'texto' ? ROYAL : BG_CARD,
+              color: modoEntrada === 'texto' ? '#ffffff' : MUTED,
+              border: 'none',
+              padding: '10px 20px',
+              fontSize: '14px',
+              cursor: 'pointer',
+              transition: 'background 0.15s',
+              fontWeight: '500',
+            }}
+            onMouseEnter={(e) => {
+              if (modoEntrada !== 'texto') e.currentTarget.style.background = 'rgba(255,255,255,0.04)';
+            }}
+            onMouseLeave={(e) => {
+              if (modoEntrada !== 'texto') e.currentTarget.style.background = BG_CARD;
+            }}
+          >
+            Digitar redação
+          </button>
+        </div>
+
+        {modoEntrada === 'arquivo' && (
+          <>
+        {/* Drag and Drop */}
         <div
           onDragEnter={handleDrag}
           onDragLeave={handleDrag}
           onDragOver={handleDrag}
           onDrop={handleDrop}
           style={{
-            height: '200px',
-            border: dragActive ? '2px dashed #4a7cff' : '2px dashed #1e2a3a',
+            border: `2px dashed ${dragActive ? '#4a7cff' : BORDER}`,
             borderRadius: '12px',
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            cursor: 'pointer',
-            background: dragActive ? 'rgba(74, 124, 255, 0.05)' : 'transparent',
-            transition: 'all 0.3s',
+            padding: '48px 24px',
+            background: dragActive ? 'rgba(74,124,255,0.05)' : 'transparent',
+            transition: 'border-color 0.2s, background 0.2s',
             marginBottom: '24px',
+            cursor: 'pointer',
           }}
         >
           <input
@@ -144,79 +209,174 @@ export default function Upload() {
             style={{ display: 'none' }}
             accept=".pdf,.doc,.docx,.txt"
           />
-          <label htmlFor="fileInput" style={{ cursor: 'pointer', textAlign: 'center', width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '32px', marginBottom: '12px' }}>📄</span>
-            <span style={{ color: '#ffffff', fontSize: '16px', fontWeight: '500', marginBottom: '4px' }}>
-              Arraste arquivos aqui ou clique para selecionar
-            </span>
-            <span style={{ color: '#7a8ba8', fontSize: '13px' }}>
-              PDF, DOC, DOCX ou TXT (máx. 10MB)
-            </span>
+          <label htmlFor="fileInput" style={{
+            cursor: 'pointer',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            gap: '12px',
+          }}>
+            <IconFile />
+            <div style={{ textAlign: 'center' }}>
+              <div style={{ color: '#ffffff', fontSize: '15px', fontWeight: '500', marginBottom: '4px' }}>
+                Arraste arquivos aqui ou clique para selecionar
+              </div>
+              <div style={{ color: MUTED, fontSize: '13px' }}>
+                PDF, DOC, DOCX ou TXT — máx. 10 MB por arquivo
+              </div>
+            </div>
           </label>
         </div>
 
-        {/* File List */}
         {files.length > 0 && (
           <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
-              Arquivos adicionados ({files.length})
+            <h3 style={{ color: '#9aaac4', fontSize: '13px', fontWeight: '500', marginBottom: '10px' }}>
+              {files.length} arquivo{files.length > 1 ? 's' : ''} adicionado{files.length > 1 ? 's' : ''}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {files.map((file, i) => (
-                <div
-                  key={i}
-                  style={{
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    padding: '12px 16px',
-                    background: '#0a0f1a',
-                    border: '1px solid #1e2a3a',
-                    borderRadius: '8px',
-                  }}
-                >
-                  <div>
-                    <div style={{ color: '#ffffff', fontSize: '14px', fontWeight: '500' }}>{file.name}</div>
-                    <div style={{ color: '#7a8ba8', fontSize: '12px', marginTop: '4px' }}>{file.size}</div>
+                <div key={i} style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '12px 14px',
+                  background: BG_CARD,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: '8px',
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div style={{ color: '#4a7cff' }}>
+                      <IconFileSmall />
+                    </div>
+                    <div>
+                      <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{file.name}</div>
+                      <div style={{ color: MUTED, fontSize: '11px', marginTop: '2px' }}>{file.size}</div>
+                    </div>
                   </div>
                   <button
                     onClick={() => removeFile(i)}
                     style={{
                       background: 'transparent',
                       border: 'none',
-                      color: '#ef4444',
+                      color: MUTED,
                       cursor: 'pointer',
-                      fontSize: '18px',
-                      padding: '4px 8px',
+                      padding: '4px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      borderRadius: '4px',
+                      transition: 'color 0.15s',
                     }}
+                    onMouseEnter={(e) => e.currentTarget.style.color = '#ef4444'}
+                    onMouseLeave={(e) => e.currentTarget.style.color = MUTED}
                   >
-                    ✕
+                    <IconRemove />
                   </button>
                 </div>
               ))}
             </div>
           </div>
         )}
+          </>
+        )}
 
-        {/* Submit Button */}
+        {modoEntrada === 'texto' && (
+          <>
+            {/* Campo Nome do Aluno */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
+                Nome do aluno
+              </label>
+              <input
+                type="text"
+                placeholder="Ex: Maria Silva"
+                value={nomeAluno}
+                onChange={(e) => setNomeAluno(e.target.value)}
+                style={{
+                  width: '100%',
+                  padding: '11px 14px',
+                  background: BG_INPUT,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = ROYAL}
+                onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+              />
+            </div>
+
+            {/* Campo Redação */}
+            <div style={{ marginBottom: '12px' }}>
+              <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
+                Redação
+              </label>
+              <textarea
+                placeholder="Digite ou cole aqui a redação do aluno..."
+                value={textoDigitado}
+                onChange={(e) => setTextoDigitado(e.target.value)}
+                style={{
+                  width: '100%',
+                  minHeight: '280px',
+                  padding: '14px',
+                  background: BG_INPUT,
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: '8px',
+                  color: '#ffffff',
+                  fontSize: '14px',
+                  lineHeight: 1.9,
+                  fontFamily: 'inherit',
+                  resize: 'vertical',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                  transition: 'border-color 0.2s',
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = ROYAL}
+                onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+              />
+            </div>
+
+            {/* Contador de palavras */}
+            <div style={{ color: MUTED, fontSize: '12px', textAlign: 'right', marginBottom: '24px' }}>
+              {textoDigitado.trim().split(/\s+/).filter(Boolean).length} palavras
+            </div>
+          </>
+        )}
+
+        {/* Botão */}
         <button
           onClick={() => navigate('/correcao')}
+          disabled={modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')}
           style={{
             width: '100%',
-            padding: '14px 24px',
-            background: 'linear-gradient(135deg, #4a7cff 0%, #3b5ec9 100%)',
-            color: '#ffffff',
-            border: 'none',
+            padding: '13px 24px',
+            background: (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? '#0f1a2e' : ROYAL,
+            color: (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? MUTED : '#ffffff',
+            border: `1px solid ${(modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? BORDER : ROYAL}`,
             borderRadius: '8px',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: '600',
-            cursor: 'pointer',
-            transition: 'opacity 0.3s',
+            cursor: (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? 'not-allowed' : 'pointer',
+            transition: 'background 0.15s',
           }}
-          onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
-          onMouseLeave={(e) => (e.target.style.opacity = '1')}
+          onMouseEnter={(e) => {
+            if (modoEntrada === 'arquivo') {
+              if (files.length > 0) e.currentTarget.style.background = '#234db0';
+            } else {
+              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '') e.currentTarget.style.background = '#234db0';
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (modoEntrada === 'arquivo') {
+              if (files.length > 0) e.currentTarget.style.background = ROYAL;
+            } else {
+              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '') e.currentTarget.style.background = ROYAL;
+            }
+          }}
         >
-          Enviar para Correção
+          Enviar para correção
         </button>
       </div>
     </div>

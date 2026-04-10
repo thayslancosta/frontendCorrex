@@ -1,34 +1,56 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
+const ROYAL = '#1a3a7c';
+const BORDER = '#1a2540';
+const MUTED = '#6b7a99';
+const BG_CARD = '#0a0f1a';
+
+const IconX = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <path d="M1 1l10 10M11 1L1 11" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+  </svg>
+);
+
+const IconCheck = () => (
+  <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+    <path d="M1.5 6l3 3 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+  </svg>
+);
+
+const erros = [
+  { categoria: 'Grammar', erro: 'My hobby is play football', correcao: 'My hobby is playing football' },
+  { categoria: 'Vocabulary', erro: 'I like the football very much', correcao: 'I like football very much' },
+  { categoria: 'Spelling', erro: 'I practise it evry week', correcao: 'I practice it every week' },
+];
+
+const badgeConfig = {
+  Grammar: { bg: 'rgba(74,124,255,0.10)', color: '#4a7cff', border: 'rgba(74,124,255,0.25)' },
+  Vocabulary: { bg: 'rgba(245,158,11,0.10)', color: '#f59e0b', border: 'rgba(245,158,11,0.25)' },
+  Spelling: { bg: 'rgba(239,68,68,0.10)', color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+};
+
 export default function Correcao() {
   const navigate = useNavigate();
+  const [editandoTexto, setEditandoTexto] = useState(false);
+  const [textoRedacao, setTextoRedacao] = useState('My favorite hobby is playing football. I like the football very much. Every week I play with my friends in the park. I practise it evry week. This sport helps me to stay healthy and happy. It is very important for me.');
+  const [feedbackExtra, setFeedbackExtra] = useState('');
+  const [notaFinalManual, setNotaFinalManual] = useState(7.5);
 
-  const erros = [
-    {
-      categoria: 'Grammar',
-      erro: 'My hobby is play football',
-      correcao: 'My hobby is playing football',
-    },
-    {
-      categoria: 'Vocabulary',
-      erro: 'I like the football very much',
-      correcao: 'I like football very much',
-    },
-    {
-      categoria: 'Spelling',
-      erro: 'I practise it evry week',
-      correcao: 'I practice it every week',
-    },
-  ];
+  const [notasCriterios, setNotasCriterios] = useState([
+    { nome: 'Gramática', nota: 7.0, peso: 30 },
+    { nome: 'Vocabulário', nota: 8.0, peso: 25 },
+    { nome: 'Coerência', nota: 8.5, peso: 25 },
+    { nome: 'Ortografia', nota: 6.5, peso: 20 },
+  ]);
 
-  const getBadgeColor = (categoria) => {
-    const colors = {
-      Grammar: '#4a7cff',
-      Vocabulary: '#f59e0b',
-      Spelling: '#ef4444',
-    };
-    return colors[categoria] || '#7a8ba8';
+  const notaFinal = notasCriterios.reduce((acc, c) => acc + (c.nota * c.peso / 100), 0);
+
+  const handleAtualizarNota = (nome, novaNota) => {
+    setNotasCriterios(
+      notasCriterios.map((c) => (c.nome === nome ? { ...c, nota: novaNota } : c))
+    );
   };
 
   return (
@@ -36,149 +58,344 @@ export default function Correcao() {
       <Sidebar />
 
       <div className="page-content">
+        {/* Botão Voltar */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'transparent',
+            border: 'none',
+            color: '#6b7a99',
+            fontSize: '13px',
+            cursor: 'pointer',
+            padding: '0',
+            marginBottom: '20px',
+            transition: 'color 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#6b7a99'}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Voltar
+        </button>
+
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
+          <h1 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
             Correção
           </h1>
-          <p style={{ color: '#7a8ba8', fontSize: '14px' }}>
+          <p style={{ color: MUTED, fontSize: '14px' }}>
             Resultado da análise da redação
           </p>
         </div>
 
-        {/* Two Columns */}
-        <div className="split-columns">
-          {/* Left Column - Original Text */}
+        {/* Duas colunas */}
+        <div className="split-columns" style={{ marginBottom: '24px' }}>
+
+          {/* Coluna esquerda - Redação original */}
           <div style={{ flex: 1 }}>
             <div style={{
-              background: '#0a0f1a',
-              border: '1px solid #1e2a3a',
+              background: BG_CARD,
+              border: `1px solid ${BORDER}`,
               borderRadius: '12px',
               padding: '24px',
+              height: '100%',
             }}>
-              <h2 style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600', marginBottom: '20px' }}>
-                Redação Original
-              </h2>
-              <div style={{ color: '#c9d1d9', lineHeight: '1.8', fontSize: '14px' }}>
-                <p>
-                  My favorite hobby is playing football.{' '}
-                  <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
-                    I like the football very much
-                  </span>
-                  . Every week I play with my friends in the park. {' '}
-                  <span style={{ background: 'rgba(239, 68, 68, 0.15)', color: '#ef4444' }}>
-                    I practise it evry week
-                  </span>
-                  . This sport helps me to stay healthy and happy. It is very important for me.
-                </p>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px' }}>
+                <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', margin: '0' }}>
+                  Redação original
+                </h2>
+                <button
+                  onClick={() => setEditandoTexto(!editandoTexto)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#4a7cff',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: 'pointer',
+                    padding: '0',
+                    transition: 'color 0.2s',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#6aa5ff'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#4a7cff'}
+                >
+                  {editandoTexto ? 'Salvar' : 'Editar'}
+                </button>
               </div>
+              {editandoTexto ? (
+                <textarea
+                  value={textoRedacao}
+                  onChange={(e) => setTextoRedacao(e.target.value)}
+                  style={{
+                    width: '100%',
+                    minHeight: '180px',
+                    background: '#0d1424',
+                    border: `1px solid ${BORDER}`,
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    lineHeight: 1.8,
+                    padding: '12px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+                />
+              ) : (
+                <div style={{ color: '#c0cce0', lineHeight: '1.9', fontSize: '14px' }}>
+                  <p style={{ margin: 0, whiteSpace: 'pre-wrap' }}>
+                    {textoRedacao}
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Right Column - AI Analysis */}
+          {/* Coluna direita - Análise da IA */}
           <div style={{ flex: 1 }}>
             <div style={{
-              background: '#0a0f1a',
-              border: '1px solid #1e2a3a',
+              background: BG_CARD,
+              border: `1px solid ${BORDER}`,
               borderRadius: '12px',
               padding: '24px',
             }}>
-              <h2 style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600', marginBottom: '24px' }}>
+              <h2 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', marginBottom: '20px' }}>
                 Análise da IA
               </h2>
 
-              {/* Score */}
-              <div style={{ marginBottom: '32px' }}>
-                <div style={{
-                  color: '#4a7cff',
-                  fontSize: '32px',
-                  fontWeight: '700',
-                  marginBottom: '16px',
-                }}>
-                  7.5 / 10
+              {/* Nota Final */}
+              <div style={{ marginBottom: '28px' }}>
+                <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '10px' }}>
+                  <span style={{ color: '#4a7cff', fontSize: '30px', fontWeight: '700' }}>
+                    {notaFinal.toFixed(1)}
+                  </span>
+                  <span style={{ color: MUTED, fontSize: '16px' }}>/10</span>
                 </div>
-
-                {/* Progress Bar */}
                 <div style={{
-                  background: '#1e2a3a',
-                  height: '8px',
-                  borderRadius: '4px',
+                  background: '#111827',
+                  height: '6px',
+                  borderRadius: '3px',
                   overflow: 'hidden',
                 }}>
                   <div style={{
-                    background: '#4a7cff',
+                    background: ROYAL,
                     height: '100%',
-                    width: '75%',
-                    borderRadius: '4px',
+                    width: `${(notaFinal / 10) * 100}%`,
+                    borderRadius: '3px',
                   }} />
                 </div>
               </div>
 
-              {/* Errors Found */}
-              <div style={{ marginBottom: '32px' }}>
-                <h3 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', marginBottom: '16px' }}>
-                  Erros Encontrados
+              {/* Nota por Critério */}
+              <div style={{ marginBottom: '28px' }}>
+                <h3 style={{ color: '#9aaac4', fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px' }}>
+                  Nota por critério
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {erros.map((error, i) => (
-                    <div key={i} style={{ borderBottom: i < erros.length - 1 ? '1px solid #1e2a3a' : 'none', paddingBottom: '16px' }}>
-                      <div style={{ marginBottom: '8px' }}>
-                        <span style={{
-                          display: 'inline-block',
-                          padding: '4px 10px',
-                          borderRadius: '20px',
-                          fontSize: '11px',
-                          fontWeight: '600',
-                          background: `${getBadgeColor(error.categoria)}20`,
-                          color: getBadgeColor(error.categoria),
-                          marginBottom: '8px',
-                        }}>
-                          {error.categoria}
+                  {notasCriterios.map((criterio) => (
+                    <div key={criterio.nome} style={{
+                      borderBottom: `1px solid ${BORDER}`,
+                      paddingBottom: '16px',
+                    }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '8px' }}>
+                        <span style={{ color: '#9aaac4', fontSize: '13px', fontWeight: '600' }}>
+                          {criterio.nome} — {criterio.peso}%
                         </span>
+                        <input
+                          type="number"
+                          min="0"
+                          max="10"
+                          step="0.1"
+                          value={criterio.nota}
+                          onChange={(e) => handleAtualizarNota(criterio.nome, parseFloat(e.target.value))}
+                          style={{
+                            width: '64px',
+                            padding: '6px 10px',
+                            background: '#0d1424',
+                            border: `1px solid ${BORDER}`,
+                            borderRadius: '6px',
+                            color: '#ffffff',
+                            fontSize: '14px',
+                            textAlign: 'center',
+                            outline: 'none',
+                            transition: 'border-color 0.2s',
+                          }}
+                          onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+                          onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+                        />
                       </div>
-                      <div style={{ color: '#ef4444', fontSize: '13px', marginBottom: '4px' }}>
-                        ✗ {error.erro}
-                      </div>
-                      <div style={{ color: '#22c55e', fontSize: '13px' }}>
-                        ✓ {error.correcao}
+                      <div style={{
+                        background: '#111827',
+                        height: '4px',
+                        borderRadius: '2px',
+                        overflow: 'hidden',
+                      }}>
+                        <div style={{
+                          background: '#1a3a7c',
+                          height: '100%',
+                          width: `${(criterio.nota / 10) * 100}%`,
+                          borderRadius: '2px',
+                          transition: 'width 0.2s',
+                        }} />
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
 
-              {/* General Comment */}
-              <div>
-                <h3 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', marginBottom: '12px' }}>
-                  Comentário Geral
+              {/* Erros */}
+              <div style={{ marginBottom: '28px' }}>
+                <h3 style={{ color: '#9aaac4', fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '14px' }}>
+                  Erros encontrados
                 </h3>
-                <p style={{ color: '#cbd5e1', fontSize: '13px', lineHeight: '1.6' }}>
-                  Ótima redação! Você demonstra boa compreensão do vocabulário e estrutura de frases. Trabalhe nos tempos verbais e preposições. Continue praticando e sua nota melhorará significativamente. Sua criatividade na escrita é evidente!
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                  {erros.map((error, i) => {
+                    const cfg = badgeConfig[error.categoria];
+                    return (
+                      <div key={i} style={{
+                        borderBottom: i < erros.length - 1 ? `1px solid ${BORDER}` : 'none',
+                        paddingBottom: '14px',
+                      }}>
+                        <span style={{
+                          display: 'inline-block',
+                          padding: '3px 9px',
+                          borderRadius: '20px',
+                          fontSize: '11px',
+                          fontWeight: '500',
+                          background: cfg.bg,
+                          color: cfg.color,
+                          border: `1px solid ${cfg.border}`,
+                          marginBottom: '8px',
+                        }}>
+                          {error.categoria}
+                        </span>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', marginBottom: '4px', color: '#e07070', fontSize: '13px' }}>
+                          <IconX />
+                          <span>{error.erro}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: '7px', color: '#4ade80', fontSize: '13px' }}>
+                          <IconCheck />
+                          <span>{error.correcao}</span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Comentário geral */}
+              <div>
+                <h3 style={{ color: '#9aaac4', fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '10px' }}>
+                  Comentário geral
+                </h3>
+                <p style={{ color: '#c0cce0', fontSize: '13px', lineHeight: '1.7', margin: 0 }}>
+                  Ótima redação! Você demonstra boa compreensão do vocabulário e estrutura de frases. Trabalhe nos tempos verbais e preposições. Sua criatividade na escrita é evidente.
                 </p>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Action Button */}
+        {/* Seção de revisão completa */}
+        <div style={{
+          background: '#0a0f1a',
+          border: `1px solid ${BORDER}`,
+          borderRadius: '12px',
+          padding: '24px',
+          marginBottom: '24px',
+        }}>
+          <h3 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', marginBottom: '20px' }}>
+            Revisão antes de enviar
+          </h3>
+
+          {/* Feedback adicional */}
+          <div style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '8px', fontWeight: '600' }}>
+              Feedback adicional
+            </label>
+            <textarea
+              value={feedbackExtra}
+              onChange={(e) => setFeedbackExtra(e.target.value)}
+              placeholder="Adicione comentários personalizados para o aluno..."
+              style={{
+                width: '100%',
+                minHeight: '120px',
+                background: '#0d1424',
+                border: `1px solid ${BORDER}`,
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '14px',
+                lineHeight: '1.8',
+                padding: '12px',
+                fontFamily: 'inherit',
+                resize: 'vertical',
+                outline: 'none',
+                boxSizing: 'border-box',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+              onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+            />
+          </div>
+
+          {/* Nota final ajustável */}
+          <div>
+            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '8px', fontWeight: '600' }}>
+              Nota final (ajuste manual)
+            </label>
+            <input
+              type="number"
+              min="0"
+              max="10"
+              step="0.1"
+              value={notaFinalManual}
+              onChange={(e) => setNotaFinalManual(parseFloat(e.target.value))}
+              style={{
+                width: '110px',
+                background: '#0d1424',
+                border: `1px solid ${BORDER}`,
+                borderRadius: '8px',
+                color: '#ffffff',
+                fontSize: '14px',
+                padding: '10px 12px',
+                outline: 'none',
+                textAlign: 'center',
+                transition: 'border-color 0.2s',
+              }}
+              onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+              onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+            />
+          </div>
+        </div>
+
+        {/* Botão */}
         <button
           onClick={() => navigate('/revisao')}
           style={{
             width: '100%',
-            padding: '14px 24px',
-            background: 'linear-gradient(135deg, #4a7cff 0%, #3b5ec9 100%)',
+            padding: '13px 24px',
+            background: ROYAL,
             color: '#ffffff',
             border: 'none',
             borderRadius: '8px',
-            fontSize: '16px',
+            fontSize: '14px',
             fontWeight: '600',
             cursor: 'pointer',
-            transition: 'opacity 0.3s',
+            transition: 'background 0.15s',
           }}
-          onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
-          onMouseLeave={(e) => (e.target.style.opacity = '1')}
+          onMouseEnter={(e) => e.currentTarget.style.background = '#234db0'}
+          onMouseLeave={(e) => e.currentTarget.style.background = ROYAL}
         >
-          Finalizar Revisão
+          Finalizar revisão
         </button>
       </div>
     </div>

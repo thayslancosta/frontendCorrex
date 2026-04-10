@@ -2,37 +2,39 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
+const ROYAL = '#1a3a7c';
+const BORDER = '#1a2540';
+const MUTED = '#6b7a99';
+const BG_CARD = '#0a0f1a';
+const BG_INPUT = '#0d1424';
+const BG_ROW = '#0d1424';
+
+const badgeConfig = {
+  Grammar: { bg: 'rgba(74,124,255,0.10)', color: '#4a7cff', border: 'rgba(74,124,255,0.25)' },
+  Vocabulary: { bg: 'rgba(245,158,11,0.10)', color: '#f59e0b', border: 'rgba(245,158,11,0.25)' },
+  Spelling: { bg: 'rgba(239,68,68,0.10)', color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
+};
+
+const erros = [
+  { categoria: 'Grammar', erro: 'I like the football very much', correcao: 'I like football very much' },
+  { categoria: 'Vocabulary', erro: 'I practise it evry week', correcao: 'I practice it every week' },
+  { categoria: 'Spelling', erro: 'My hobby is play football', correcao: 'My hobby is playing football' },
+];
+
+const inputStyle = {
+  background: BG_INPUT,
+  border: `1px solid ${BORDER}`,
+  borderRadius: '8px',
+  color: '#ffffff',
+  fontSize: '14px',
+  outline: 'none',
+  boxSizing: 'border-box',
+};
+
 export default function Revisao() {
   const navigate = useNavigate();
   const [nota, setNota] = useState(7.5);
   const [feedback, setFeedback] = useState('');
-
-  const erros = [
-    {
-      categoria: 'Grammar',
-      erro: 'I like the football very much',
-      correcao: 'I like football very much',
-    },
-    {
-      categoria: 'Vocabulary',
-      erro: 'I practise it evry week',
-      correcao: 'I practice it every week',
-    },
-    {
-      categoria: 'Spelling',
-      erro: 'My hobby is play football',
-      correcao: 'My hobby is playing football',
-    },
-  ];
-
-  const getBadgeColor = (categoria) => {
-    const colors = {
-      Grammar: '#4a7cff',
-      Vocabulary: '#f59e0b',
-      Spelling: '#ef4444',
-    };
-    return colors[categoria] || '#7a8ba8';
-  };
 
   const handleSubmit = () => {
     alert('Correção enviada com sucesso!');
@@ -44,59 +46,73 @@ export default function Revisao() {
       <Sidebar />
 
       <div className="page-content">
+        {/* Botão Voltar */}
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            background: 'transparent',
+            border: 'none',
+            color: '#6b7a99',
+            fontSize: '13px',
+            cursor: 'pointer',
+            padding: '0',
+            marginBottom: '20px',
+            transition: 'color 0.2s',
+          }}
+          onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+          onMouseLeave={(e) => e.currentTarget.style.color = '#6b7a99'}
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          Voltar
+        </button>
+
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '24px', fontWeight: '700', marginBottom: '4px' }}>
+          <h1 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
             Revisão
           </h1>
-          <p style={{ color: '#7a8ba8', fontSize: '14px' }}>
-            Revise e finalize a correção antes de enviar ao aluno
+          <p style={{ color: MUTED, fontSize: '14px' }}>
+            Revise e finalize antes de enviar ao aluno
           </p>
         </div>
 
-        {/* Main Card */}
+        {/* Card principal */}
         <div style={{
-          background: '#0a0f1a',
-          border: '1px solid #1e2a3a',
+          background: BG_CARD,
+          border: `1px solid ${BORDER}`,
           borderRadius: '12px',
-          padding: '24px',
-          marginBottom: '24px',
+          padding: '28px',
+          marginBottom: '20px',
         }}>
-          {/* Student Info */}
-          <div className="review-info">
-            <div>
-              <div style={{ color: '#7a8ba8', fontSize: '12px', fontWeight: '500', marginBottom: '4px', textTransform: 'uppercase' }}>
-                Aluno
+          {/* Info do aluno */}
+          <div className="review-info" style={{ marginBottom: '24px' }}>
+            {[
+              { label: 'Aluno', value: 'Maria Silva' },
+              { label: 'Turma', value: 'Inglês B2' },
+              { label: 'Data', value: '08/04/2026' },
+            ].map(({ label, value }) => (
+              <div key={label}>
+                <div style={{ color: MUTED, fontSize: '11px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '5px' }}>
+                  {label}
+                </div>
+                <div style={{ color: '#ffffff', fontSize: '15px', fontWeight: '500' }}>
+                  {value}
+                </div>
               </div>
-              <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600' }}>
-                Maria Silva
-              </div>
-            </div>
-            <div>
-              <div style={{ color: '#7a8ba8', fontSize: '12px', fontWeight: '500', marginBottom: '4px', textTransform: 'uppercase' }}>
-                Turma
-              </div>
-              <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600' }}>
-                Inglês B2
-              </div>
-            </div>
-            <div>
-              <div style={{ color: '#7a8ba8', fontSize: '12px', fontWeight: '500', marginBottom: '4px', textTransform: 'uppercase' }}>
-                Data
-              </div>
-              <div style={{ color: '#ffffff', fontSize: '16px', fontWeight: '600' }}>
-                08/04/2026
-              </div>
-            </div>
+            ))}
           </div>
 
-          {/* Divider */}
-          <div style={{ borderBottom: '1px solid #1e2a3a', margin: '20px 0' }} />
+          <div style={{ borderBottom: `1px solid ${BORDER}`, marginBottom: '24px' }} />
 
-          {/* Final Grade */}
+          {/* Nota */}
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
-              Nota Final
+            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+              Nota final
             </label>
             <input
               type="number"
@@ -105,104 +121,101 @@ export default function Revisao() {
               step="0.1"
               value={nota}
               onChange={(e) => setNota(parseFloat(e.target.value))}
-              style={{
-                width: '120px',
-                padding: '12px 16px',
-                background: '#111827',
-                border: '1px solid #1e2a3a',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '14px',
-              }}
+              style={{ ...inputStyle, width: '110px', padding: '10px 14px' }}
+              onFocus={(e) => e.target.style.borderColor = ROYAL}
+              onBlur={(e) => e.target.style.borderColor = BORDER}
             />
           </div>
 
-          {/* Feedback TextArea */}
+          {/* Feedback */}
           <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', color: '#cbd5e1', marginBottom: '8px', fontSize: '14px', fontWeight: '500' }}>
-              Feedback para o Aluno
+            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+              Feedback para o aluno
             </label>
             <textarea
               value={feedback}
               onChange={(e) => setFeedback(e.target.value)}
               placeholder="Adicione comentários personalizados para o aluno..."
               style={{
+                ...inputStyle,
                 width: '100%',
-                minHeight: '120px',
-                padding: '12px 16px',
-                background: '#111827',
-                border: '1px solid #1e2a3a',
-                borderRadius: '8px',
-                color: '#ffffff',
-                fontSize: '14px',
-                fontFamily: "'Segoe UI', sans-serif",
+                minHeight: '110px',
+                padding: '11px 14px',
+                fontFamily: 'inherit',
                 resize: 'vertical',
               }}
+              onFocus={(e) => e.target.style.borderColor = ROYAL}
+              onBlur={(e) => e.target.style.borderColor = BORDER}
             />
           </div>
 
-          {/* Error Summary */}
-          <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ color: '#ffffff', fontSize: '14px', fontWeight: '600', marginBottom: '16px' }}>
-              Resumo dos Erros
+          {/* Resumo de erros */}
+          <div>
+            <h3 style={{ color: '#9aaac4', fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>
+              Resumo dos erros
             </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-              {erros.map((error, i) => (
-                <div
-                  key={i}
-                  className="error-row"
-                  style={{
-                    padding: '12px 16px',
-                    background: '#131b2e',
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+              {erros.map((error, i) => {
+                const cfg = badgeConfig[error.categoria];
+                return (
+                  <div key={i} style={{
+                    padding: '11px 14px',
+                    background: BG_ROW,
                     borderRadius: '8px',
-                  }}
-                >
-                  <div>
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '10px',
+                    flexWrap: 'wrap',
+                  }}>
                     <span style={{
-                      display: 'inline-block',
-                      padding: '3px 8px',
-                      borderRadius: '16px',
-                      fontSize: '10px',
-                      fontWeight: '600',
-                      background: `${getBadgeColor(error.categoria)}20`,
-                      color: getBadgeColor(error.categoria),
-                      marginRight: '8px',
+                      padding: '2px 8px',
+                      borderRadius: '20px',
+                      fontSize: '11px',
+                      fontWeight: '500',
+                      background: cfg.bg,
+                      color: cfg.color,
+                      border: `1px solid ${cfg.border}`,
+                      flexShrink: 0,
                     }}>
                       {error.categoria}
                     </span>
-                    <span style={{ color: '#cbd5e1', fontSize: '12px' }}>
-                      {error.erro} → <span style={{ color: '#22c55e' }}>{error.correcao}</span>
+                    <span style={{ color: '#9aaac4', fontSize: '13px' }}>
+                      {error.erro}
+                    </span>
+                    <span style={{ color: MUTED, fontSize: '13px' }}>→</span>
+                    <span style={{ color: '#4ade80', fontSize: '13px' }}>
+                      {error.correcao}
                     </span>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
 
-        {/* Action Buttons */}
+        {/* Botões de ação */}
         <div className="review-actions">
           <button
             onClick={() => navigate('/correcao')}
             style={{
               flex: 1,
-              padding: '14px 24px',
+              padding: '13px 24px',
               background: 'transparent',
-              border: '1px solid #1e2a3a',
+              border: `1px solid ${BORDER}`,
               borderRadius: '8px',
-              color: '#7a8ba8',
-              fontSize: '16px',
-              fontWeight: '600',
+              color: MUTED,
+              fontSize: '14px',
+              fontWeight: '500',
               cursor: 'pointer',
-              transition: 'all 0.3s',
+              transition: 'border-color 0.15s, color 0.15s',
             }}
             onMouseEnter={(e) => {
-              e.target.style.background = 'rgba(255,255,255,0.04)';
-              e.target.style.color = '#ffffff';
+              e.currentTarget.style.borderColor = '#2a3a5a';
+              e.currentTarget.style.color = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              e.target.style.background = 'transparent';
-              e.target.style.color = '#7a8ba8';
+              e.currentTarget.style.borderColor = BORDER;
+              e.currentTarget.style.color = MUTED;
             }}
           >
             Voltar
@@ -211,20 +224,20 @@ export default function Revisao() {
             onClick={handleSubmit}
             style={{
               flex: 1,
-              padding: '14px 24px',
-              background: 'linear-gradient(135deg, #4a7cff 0%, #3b5ec9 100%)',
+              padding: '13px 24px',
+              background: ROYAL,
               color: '#ffffff',
               border: 'none',
               borderRadius: '8px',
-              fontSize: '16px',
+              fontSize: '14px',
               fontWeight: '600',
               cursor: 'pointer',
-              transition: 'opacity 0.3s',
+              transition: 'background 0.15s',
             }}
-            onMouseEnter={(e) => (e.target.style.opacity = '0.9')}
-            onMouseLeave={(e) => (e.target.style.opacity = '1')}
+            onMouseEnter={(e) => e.currentTarget.style.background = '#234db0'}
+            onMouseLeave={(e) => e.currentTarget.style.background = ROYAL}
           >
-            Enviar ao Aluno
+            Enviar ao aluno
           </button>
         </div>
       </div>
