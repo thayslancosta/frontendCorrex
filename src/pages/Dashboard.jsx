@@ -57,26 +57,21 @@ export default function Dashboard() {
 
       <div className="page-content">
         {/* Header */}
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
+        <div className="section-header">
+          <h1 style={{ color: '#ffffff', marginBottom: '4px' }}>
             Dashboard
           </h1>
-          <p style={{ color: MUTED, fontSize: '14px' }}>
+          <p style={{ color: MUTED }}>
             Bem-vindo de volta, Professor
           </p>
         </div>
 
         {/* Cards de estatísticas */}
-        <div className="stats-grid" style={{ marginBottom: '28px' }}>
+        <div className="stats-grid">
           {stats.map(({ label, value, Icon, accent }) => (
-            <div key={label} style={{
-              background: BG_CARD,
-              border: `1px solid ${BORDER}`,
-              borderRadius: '12px',
-              padding: '20px',
-            }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
-                <span style={{ color: MUTED, fontSize: '13px' }}>{label}</span>
+            <div key={label} className="card-wrapper" style={{ padding: '16px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '14px' }}>
+                <span style={{ color: MUTED, fontSize: '12px' }}>{label}</span>
                 <div style={{
                   width: '32px',
                   height: '32px',
@@ -86,36 +81,33 @@ export default function Dashboard() {
                   alignItems: 'center',
                   justifyContent: 'center',
                   color: accent === '#1a3a7c' ? '#6a9fff' : accent === '#0f5a3a' ? '#22c55e' : accent === '#7a4a00' ? '#f59e0b' : '#ef4444',
+                  flexShrink: 0,
                 }}>
                   <Icon />
                 </div>
               </div>
-              <div style={{ color: '#ffffff', fontSize: '28px', fontWeight: '600' }}>{value}</div>
+              <div style={{ color: '#ffffff', fontSize: '24px', fontWeight: '600' }}>{value}</div>
             </div>
           ))}
         </div>
 
         {/* Tabela */}
-        <div style={{
-          background: BG_CARD,
-          border: `1px solid ${BORDER}`,
-          borderRadius: '12px',
-          padding: '24px',
-        }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-            <h2 style={{ color: '#ffffff', fontSize: '15px', fontWeight: '600' }}>
+        <div className="card-wrapper" style={{ padding: '12px' }}>
+          <div className="card-header">
+            <h2 style={{ color: '#ffffff', marginBottom: '0' }}>
               Correções recentes
             </h2>
-            <span style={{
+            <a href="#" style={{
               fontSize: '12px',
               color: '#4a7cff',
-              cursor: 'pointer',
               padding: '4px 10px',
               border: '1px solid #1a3a7c',
               borderRadius: '6px',
+              textDecoration: 'none',
+              whiteSpace: 'nowrap',
             }}>
               Ver todas
-            </span>
+            </a>
           </div>
 
           <div className="table-wrap">
@@ -128,7 +120,7 @@ export default function Dashboard() {
                       fontSize: '11px',
                       fontWeight: '500',
                       textAlign: 'left',
-                      padding: '10px 14px',
+                      padding: '8px 10px',
                       borderBottom: `1px solid ${BORDER}`,
                       textTransform: 'uppercase',
                       letterSpacing: '0.6px',
@@ -146,22 +138,14 @@ export default function Dashboard() {
                     onMouseEnter={(e) => e.currentTarget.style.background = '#0d1424'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    <td style={{ padding: '13px 14px', color: '#ffffff', fontSize: '14px', fontWeight: '500' }}>{item.aluno}</td>
-                    <td style={{ padding: '13px 14px', color: MUTED, fontSize: '13px' }}>{item.turma}</td>
-                    <td style={{ padding: '13px 14px', color: item.nota ? '#ffffff' : MUTED, fontSize: '14px', fontWeight: '600' }}>
+                    <td style={{ padding: '10px', color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{item.aluno}</td>
+                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.turma}</td>
+                    <td style={{ padding: '10px', color: item.nota ? '#ffffff' : MUTED, fontSize: '13px', fontWeight: '600' }}>
                       {item.nota ?? '—'}
                     </td>
-                    <td style={{ padding: '13px 14px', color: MUTED, fontSize: '13px' }}>{item.data}</td>
-                    <td style={{ padding: '13px 14px' }}>
-                      <span style={{
-                        padding: '3px 10px',
-                        borderRadius: '20px',
-                        fontSize: '12px',
-                        fontWeight: '500',
-                        background: item.status === 'Corrigida' ? 'rgba(34,197,94,0.10)' : 'rgba(245,158,11,0.10)',
-                        color: item.status === 'Corrigida' ? '#22c55e' : '#f59e0b',
-                        border: `1px solid ${item.status === 'Corrigida' ? 'rgba(34,197,94,0.2)' : 'rgba(245,158,11,0.2)'}`,
-                      }}>
+                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.data}</td>
+                    <td style={{ padding: '10px' }}>
+                      <span className={`badge badge-${item.status === 'Corrigida' ? 'success' : 'warning'}`}>
                         {item.status}
                       </span>
                     </td>
