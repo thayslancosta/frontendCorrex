@@ -145,104 +145,117 @@ export default function Alunos() {
           </div>
         </div>
 
-        {loading && <p style={{ color: '#6b7a99', padding: '40px', textAlign: 'center' }}>Carregando alunos...</p>}
-        {erro && <p style={{ color: '#ef4444', padding: '40px', textAlign: 'center' }}>{erro}</p>}
+        {loading && (
+          <p style={{ color: '#6b7a99', padding: '40px', textAlign: 'center' }}>
+            Carregando alunos...
+          </p>
+        )}
 
-        {/* Tabela de Alunos */}
-        <div style={{ overflowX: 'auto' }}>
-          <table
-            style={{
-              width: '100%',
-              borderCollapse: 'collapse',
-              borderSpacing: '0',
-            }}
-          >
-            <thead>
-              <tr
+        {erro && (
+          <p style={{ color: '#ef4444', padding: '40px', textAlign: 'center' }}>
+            {erro}
+          </p>
+        )}
+
+        {!loading && !erro && (
+          <>
+            {/* Tabela de Alunos */}
+            <div style={{ overflowX: 'auto' }}>
+              <table
                 style={{
-                  borderBottom: '1px solid #1a2540',
-                  backgroundColor: '#0a0f1a',
+                  width: '100%',
+                  borderCollapse: 'collapse',
+                  borderSpacing: '0',
                 }}
               >
-                <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Nome</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Turma</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Média</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Redações</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Última atividade</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Ação</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredAlunos.map((aluno, index) => (
-                <tr
-                  key={index}
-                  style={{
-                    borderBottom: '1px solid #1a2540',
-                    transition: 'all 0.2s',
-                  }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(26, 58, 124, 0.08)'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                >
-                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                      <div
-                        style={{
-                          width: '32px',
-                          height: '32px',
-                          borderRadius: '50%',
-                          background: '#1a3a7c',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          fontSize: '12px',
-                          fontWeight: '700',
-                          color: '#4a7cff',
-                        }}
-                      >
-                        {getInitials(aluno.nome)}
-                      </div>
-                      {aluno.nome}
-                    </div>
-                  </td>
-                  <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.nomeTurma}</td>
-                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
-                    {aluno.mediaGeral != null ? Number(aluno.mediaGeral).toFixed(1) : '—'}
-                  </td>
-                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.totalRedacoes}</td>
-                  <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
-                  <td style={{ padding: '12px' }}>
-                    <button
+                <thead>
+                  <tr
+                    style={{
+                      borderBottom: '1px solid #1a2540',
+                      backgroundColor: '#0a0f1a',
+                    }}
+                  >
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Nome</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Turma</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Média</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Redações</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Última atividade</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Ação</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredAlunos.map((aluno, index) => (
+                    <tr
+                      key={index}
                       style={{
-                        background: 'transparent',
-                        border: '1px solid #1a3a7c',
-                        color: '#4a7cff',
-                        padding: '6px 12px',
-                        borderRadius: '6px',
-                        fontSize: '12px',
-                        fontWeight: '600',
-                        cursor: 'pointer',
+                        borderBottom: '1px solid #1a2540',
                         transition: 'all 0.2s',
                       }}
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.background = 'rgba(26, 58, 124, 0.1)';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.background = 'transparent';
-                      }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(26, 58, 124, 0.08)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      Ver redações
-                    </button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div
+                            style={{
+                              width: '32px',
+                              height: '32px',
+                              borderRadius: '50%',
+                              background: '#1a3a7c',
+                              display: 'flex',
+                              alignItems: 'center',
+                              justifyContent: 'center',
+                              fontSize: '12px',
+                              fontWeight: '700',
+                              color: '#4a7cff',
+                            }}
+                          >
+                            {getInitials(aluno.nome)}
+                          </div>
+                          {aluno.nome}
+                        </div>
+                      </td>
+                      <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.nomeTurma}</td>
+                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
+                        {aluno.mediaGeral != null ? Number(aluno.mediaGeral).toFixed(1) : '—'}
+                      </td>
+                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.totalRedacoes}</td>
+                      <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
+                      <td style={{ padding: '12px' }}>
+                        <button
+                          style={{
+                            background: 'transparent',
+                            border: '1px solid #1a3a7c',
+                            color: '#4a7cff',
+                            padding: '6px 12px',
+                            borderRadius: '6px',
+                            fontSize: '12px',
+                            fontWeight: '600',
+                            cursor: 'pointer',
+                            transition: 'all 0.2s',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.background = 'rgba(26, 58, 124, 0.1)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.background = 'transparent';
+                          }}
+                        >
+                          Ver redações
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
 
-        {filteredAlunos.length === 0 && (
-          <div style={{ textAlign: 'center', padding: '40px', color: '#6b7a99' }}>
-            Nenhum aluno encontrado.
-          </div>
+            {filteredAlunos.length === 0 && (
+              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7a99' }}>
+                Nenhum aluno encontrado.
+              </div>
+            )}
+          </>
         )}
       </div>
     </div>
