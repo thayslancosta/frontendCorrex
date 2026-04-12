@@ -8,6 +8,7 @@ const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('token');
+    console.log('API Request:', config.method?.toUpperCase(), config.url, 'Token:', token ? '✓' : '✗');
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,8 +19,12 @@ api.interceptors.request.use(
 
 // Interceptar erros de autenticação
 api.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('API Response OK:', response.status, response.config.url);
+    return response;
+  },
   (error) => {
+    console.error('API Response Error:', error.response?.status, error.response?.statusText, error.config?.url, error.response?.data);
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
