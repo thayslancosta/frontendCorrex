@@ -1,6 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { getTurmas } from '../services/turmaService';
+import { enviarRedacaoTexto, enviarRedacaoArquivo } from '../services/redacaoService';
 
 const ROYAL = '#1a3a7c';
 const BORDER = '#1a2540';
@@ -38,6 +40,13 @@ export default function Upload() {
   const [dragActive, setDragActive] = useState(false);
   const [nomeAluno, setNomeAluno] = useState('');
   const [textoDigitado, setTextoDigitado] = useState('');
+  const [turmas, setTurmas] = useState([]);
+  const [enviando, setEnviando] = useState(false);
+  const [rawFiles, setRawFiles] = useState([]);
+
+  useEffect(() => {
+    getTurmas().then(setTurmas).catch(() => {});
+  }, []);
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -50,25 +59,24 @@ export default function Upload() {
     e.stopPropagation();
     setDragActive(false);
     if (e.dataTransfer.files?.[0]) {
-      const newFiles = Array.from(e.dataTransfer.files).map((f) => ({
-        name: f.name,
-        size: (f.size / 1024).toFixed(1) + ' KB',
-      }));
-      setFiles((prev) => [...prev, ...newFiles]);
+      const newRaw = Array.from(e.dataTransfer.files);
+      setRawFiles((prev) => [...prev, ...newRaw]);
+      setFiles((prev) => [...prev, ...newRaw.map((f) => ({ name: f.name, size: (f.size / 1024).toFixed(1) + ' KB' }))]);
     }
   };
 
   const handleFileSelect = (e) => {
     if (e.target.files?.[0]) {
-      const newFiles = Array.from(e.target.files).map((f) => ({
-        name: f.name,
-        size: (f.size / 1024).toFixed(1) + ' KB',
-      }));
-      setFiles((prev) => [...prev, ...newFiles]);
+      const newRaw = Array.from(e.target.files);
+      setRawFiles((prev) => [...prev, ...newRaw]);
+      setFiles((prev) => [...prev, ...newRaw.map((f) => ({ name: f.name, size: (f.size / 1024).toFixed(1) + ' KB' }))]);
     }
   };
 
-  const removeFile = (index) => setFiles((prev) => prev.filter((_, i) => i !== index));
+  const removeFile = (index) => {
+    setFiles((prev) => prev.filter((_, i) => i !== index));
+    setRawFiles((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const selectStyle = {
     width: '100%',
@@ -105,10 +113,9 @@ export default function Upload() {
             </label>
             <select value={turma} onChange={(e) => setTurma(e.target.value)} style={selectStyle}>
               <option value="">Selecione uma turma</option>
-              <option value="en-a2">Inglês A2</option>
-              <option value="en-b1">Inglês B1</option>
-              <option value="en-b2">Inglês B2</option>
-              <option value="es-b1">Espanhol B1</option>
+              {turmas.map((t) => (
+                <option key={t.id} value={String(t.id)}>{t.nome}</option>
+              ))}
             </select>
           </div>
 
@@ -348,36 +355,61 @@ export default function Upload() {
         {/* Botão */}
         <button
           onClick={() => navigate('/correcao')}
-          disabled={modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')}
+          disabled=async () => {
+            if (!turma || !idioma) { alert('Selecione turma e idioma.'); return; }
+            setEnviando(true);
+            try {
+              let data;
+              if (modoEntrada === 'texto') {
+                data = await enviarRedacaoTexto({
+                  alunoNome: nomeAluno.trim(),
+                  turmaId: parseInt(turma),
+                  idioma,
+                  texto: textoDigitado.trim(),
+                });
+              } else {
+                const formData = new FormData();
+                rawFiles.forEach((f) => formData.append('arquivo', f));
+                formData.append('turmaId', turma);
+                formData.append('idioma', idioma);
+                data = await enviarRedacaoArquivo(formData);
+              }
+              navigate('/correcao', { state: { redacaoId: data.id } });
+            } catch {
+              alert('Erro ao enviar redação. Tente novamente.');
+            } finally {
+              setEnviando(false);
+            }
+          }}
+          disabled={enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))}
           style={{
             width: '100%',
             padding: '13px 24px',
-            background: (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? '#0f1a2e' : ROYAL,
-            color: (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? MUTED : '#ffffff',
-            border: `1px solid ${(modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? BORDER : ROYAL}`,
+            background: (enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? '#0f1a2e' : ROYAL,
+            color: (enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? MUTED : '#ffffff',
+            border: `1px solid ${(enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? BORDER : ROYAL}`,
             borderRadius: '8px',
             fontSize: '14px',
             fontWeight: '600',
-            cursor: (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === '')) ? 'not-allowed' : 'pointer',
+            cursor: (enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? 'not-allowed' : 'pointer',
             transition: 'background 0.15s',
           }}
           onMouseEnter={(e) => {
             if (modoEntrada === 'arquivo') {
-              if (files.length > 0) e.currentTarget.style.background = '#234db0';
+              if (files.length > 0 && !enviando) e.currentTarget.style.background = '#234db0';
             } else {
-              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '') e.currentTarget.style.background = '#234db0';
+              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '' && !enviando) e.currentTarget.style.background = '#234db0';
             }
           }}
           onMouseLeave={(e) => {
             if (modoEntrada === 'arquivo') {
-              if (files.length > 0) e.currentTarget.style.background = ROYAL;
+              if (files.length > 0 && !enviando) e.currentTarget.style.background = ROYAL;
             } else {
-              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '') e.currentTarget.style.background = ROYAL;
+              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '' && !enviando) e.currentTarget.style.background = ROYAL;
             }
           }}
         >
-          Enviar para correção
-        </button>
+          {enviando ? 'Enviando...' : 'Enviar para correção'}
       </div>
     </div>
   );

@@ -1,28 +1,36 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { getAlunos } from '../services/alunoService';
 
 export default function Alunos() {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('Todas as turmas');
+  const [alunos, setAlunos] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
 
-  const alunos = [
-    { nome: 'Maria Silva', turma: 'Inglês B2', media: 8.5, redacoes: 6, ultima: '08/04/2026' },
-    { nome: 'João Santos', turma: 'Inglês A2', media: 6.2, redacoes: 4, ultima: '07/04/2026' },
-    { nome: 'Ana Costa', turma: 'Espanhol B1', media: 9.0, redacoes: 8, ultima: '07/04/2026' },
-    { nome: 'Pedro Lima', turma: 'Inglês B1', media: 7.4, redacoes: 5, ultima: '06/04/2026' },
-    { nome: 'Lucas Oliveira', turma: 'Inglês A2', media: 5.8, redacoes: 3, ultima: '05/04/2026' },
-    { nome: 'Beatriz Souza', turma: 'Inglês B2', media: 9.2, redacoes: 7, ultima: '08/04/2026' },
-  ];
+  useEffect(() => {
+    getAlunos()
+      .then(setAlunos)
+      .catch(() => setErro('Erro ao carregar alunos.'))
+      .finally(() => setLoading(false));
+  }, []);
 
-  const turmas = ['Todas as turmas', 'Inglês A2', 'Inglês B1', 'Inglês B2', 'Espanhol B1'];
+  const turmas = ['Todas as turmas', ...new Set(alunos.map((a) => a.nomeTurma))];
 
   const filteredAlunos = alunos.filter((aluno) => {
     const matchesSearch = aluno.nome.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTurma = turmaFilter === 'Todas as turmas' || aluno.turma === turmaFilter;
+    const matchesTurma = turmaFilter === 'Todas as turmas' || aluno.nomeTurma === turmaFilter;
     return matchesSearch && matchesTurma;
   });
+
+  const formatarData = (iso) => {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  };
 
   const getInitials = (nome) => {
     const parts = nome.split(' ');
@@ -137,6 +145,9 @@ export default function Alunos() {
           </div>
         </div>
 
+        {loading && <p style={{ color: '#6b7a99', padding: '40px', textAlign: 'center' }}>Carregando alunos...</p>}
+        {erro && <p style={{ color: '#ef4444', padding: '40px', textAlign: 'center' }}>{erro}</p>}
+
         {/* Tabela de Alunos */}
         <div style={{ overflowX: 'auto' }}>
           <table
@@ -193,10 +204,12 @@ export default function Alunos() {
                       {aluno.nome}
                     </div>
                   </td>
-                  <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.turma}</td>
-                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.media.toFixed(1)}</td>
-                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.redacoes}</td>
-                  <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.ultima}</td>
+                  <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.nomeTurma}</td>
+                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
+                    {aluno.mediaGeral != null ? Number(aluno.mediaGeral).toFixed(1) : '—'}
+                  </td>
+                  <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.totalRedacoes}</td>
+                  <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
                   <td style={{ padding: '12px' }}>
                     <button
                       style={{

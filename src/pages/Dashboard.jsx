@@ -1,4 +1,7 @@
+import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
+import { getDashboard } from '../services/dashboardService';
+import { getUser } from '../services/authService';
 
 const ROYAL = '#1a3a7c';
 const BORDER = '#1a2540';
@@ -35,22 +38,59 @@ const IconPending = () => (
   </svg>
 );
 
-const stats = [
-  { label: 'Total de correções', value: '127', Icon: IconCorrections, accent: '#1a3a7c' },
-  { label: 'Alunos ativos', value: '34', Icon: IconStudents, accent: '#0f5a3a' },
-  { label: 'Média geral', value: '7.4', Icon: IconAverage, accent: '#7a4a00' },
-  { label: 'Pendentes', value: '5', Icon: IconPending, accent: '#7a1a1a' },
-];
-
-const recentCorrections = [
-  { aluno: 'Maria Silva', turma: 'Inglês B2', nota: 8.5, data: '08/04/2026', status: 'Corrigida' },
-  { aluno: 'João Santos', turma: 'Inglês A2', nota: 6.2, data: '07/04/2026', status: 'Corrigida' },
-  { aluno: 'Ana Costa', turma: 'Espanhol B1', nota: 9.0, data: '07/04/2026', status: 'Corrigida' },
-  { aluno: 'Pedro Lima', turma: 'Inglês B1', nota: null, data: '08/04/2026', status: 'Pendente' },
-  { aluno: 'Lucas Oliveira', turma: 'Inglês A2', nota: null, data: '08/04/2026', status: 'Pendente' },
-];
 
 export default function Dashboard() {
+  const user = getUser();
+  const [dados, setDados] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    getDashboard()
+      .then(setDados)
+      .catch(() => setErro('Erro ao carregar o dashboard.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const stats = dados ? [
+    { label: 'Total de correções', value: String(dados.totalCorrecoes),        Icon: IconCorrections, accent: '#1a3a7c' },
+    { label: 'Alunos ativos',      value: String(dados.alunosAtivos),          Icon: IconStudents,    accent: '#0f5a3a' },
+    { label: 'Média geral',        value: Number(dados.mediaGeral).toFixed(1), Icon: IconAverage,     accent: '#7a4a00' },
+    { label: 'Pendentes',          value: String(dados.correcoesPendentes),    Icon: IconPending,     accent: '#7a1a1a' },
+  ] : [];
+
+  const recentCorrections = dados?.correcoesRecentes ?? [];
+
+  const formatarData = (iso) => {
+    if (!iso) return '—';
+    const [y, m, d] = iso.split('-');
+    return `${d}/${m}/${y}`;
+  };
+
+  const labelStatus = (status) => {
+    if (status === 'CORRIGIDA') return 'Corrigida';
+    if (status === 'PENDENTE')  return 'Pendente';
+    return 'Em correção';
+  };
+
+  if (loading) return (
+    <div className="app-shell">
+      <Sidebar />
+      <div className="page-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#6b7a99' }}>
+        Carregando...
+      </div>
+    </div>
+  );
+
+  if (erro) return (
+    <div className="app-shell">
+      <Sidebar />
+      <div className="page-content" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ef4444' }}>
+        {erro}
+      </div>
+    </div>
+  );
+
   return (
     <div className="app-shell">
       <Sidebar />
@@ -62,7 +102,7 @@ export default function Dashboard() {
             Dashboard
           </h1>
           <p style={{ color: MUTED }}>
-            Bem-vindo de volta, Professor
+            Bem-vindo de volta, {user?.nome ?? 'Professor'}
           </p>
         </div>
 
@@ -133,20 +173,20 @@ export default function Dashboard() {
               <tbody>
                 {recentCorrections.map((item, i) => (
                   <tr
-                    key={i}
+                    key={item.id ?? i}
                     style={{ borderBottom: i < recentCorrections.length - 1 ? `1px solid ${BG_ROW}` : 'none' }}
                     onMouseEnter={(e) => e.currentTarget.style.background = '#0d1424'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    <td style={{ padding: '10px', color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{item.aluno}</td>
-                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.turma}</td>
-                    <td style={{ padding: '10px', color: item.nota ? '#ffffff' : MUTED, fontSize: '13px', fontWeight: '600' }}>
-                      {item.nota ?? '—'}
+                    <td style={{ padding: '10px', color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{item.nomeAluno}</td>
+                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.nomeTurma}</td>
+                    <td style={{ padding: '10px', color: item.notaFinal != null ? '#ffffff' : MUTED, fontSize: '13px', fontWeight: '600' }}>
+                      {item.notaFinal != null ? Number(item.notaFinal).toFixed(1) : '—'}
                     </td>
-                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.data}</td>
+                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{formatarData(item.dataEnvio)}</td>
                     <td style={{ padding: '10px' }}>
-                      <span className={`badge badge-${item.status === 'Corrigida' ? 'success' : 'warning'}`}>
-                        {item.status}
+                      <span className={`badge badge-${item.status === 'CORRIGIDA' ? 'success' : 'warning'}`}>
+                        {labelStatus(item.status)}
                       </span>
                     </td>
                   </tr>

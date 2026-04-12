@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { getRedacao, revisarRedacao } from '../services/redacaoService';
 
 const ROYAL = '#1a3a7c';
 const BORDER = '#1a2540';
@@ -15,12 +16,6 @@ const badgeConfig = {
   Spelling: { bg: 'rgba(239,68,68,0.10)', color: '#ef4444', border: 'rgba(239,68,68,0.25)' },
 };
 
-const erros = [
-  { categoria: 'Grammar', erro: 'I like the football very much', correcao: 'I like football very much' },
-  { categoria: 'Vocabulary', erro: 'I practise it evry week', correcao: 'I practice it every week' },
-  { categoria: 'Spelling', erro: 'My hobby is play football', correcao: 'My hobby is playing football' },
-];
-
 const inputStyle = {
   background: BG_INPUT,
   border: `1px solid ${BORDER}`,
@@ -33,12 +28,53 @@ const inputStyle = {
 
 export default function Revisao() {
   const navigate = useNavigate();
-  const [nota, setNota] = useState(7.5);
-  const [feedback, setFeedback] = useState('');
+  const location = useLocation();
+  const redacaoId = location.state?.redacaoId;
 
-  const handleSubmit = () => {
-    alert('Correção enviada com sucesso!');
-    navigate('/dashboard');
+  const [redacao, setRedacao] = useState(null);
+  const [nota, setNota] = useState('');
+  const [feedback, setFeedback] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [enviando, setEnviando] = useState(false);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    if (!redacaoId) {
+      setErro('ID da redação não fornecido');
+      setLoading(false);
+      return;
+    }
+    
+    const carregarRedacao = async () => {
+      try {
+        const data = await getRedacao(redacaoId);
+        setRedacao(data);
+        setNota(data.nota || '');
+      } catch (err) {
+        setErro('Erro ao carregar redação');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    carregarRedacao();
+  }, [redacaoId]);
+
+  const handleSubmit = async () => {
+    if (!nota || nota < 0 || nota > 10) {
+      alert('Nota deve estar entre 0 e 10');
+      return;
+    }
+    setEnviando(true);
+    try {
+      await revisarRedacao(redacaoId, { nota: parseFloat(nota), feedback: feedback.trim() });
+      alert('Revisão enviada com sucesso!');
+      navigate('/dashboard');
+    } catch {
+      alert('Erro ao enviar revisão. Tente novamente.');
+    } finally {
+      setEnviando(false);
+    }
   };
 
   return (
@@ -81,165 +117,193 @@ export default function Revisao() {
           </p>
         </div>
 
-        {/* Card principal */}
-        <div style={{
-          background: BG_CARD,
-          border: `1px solid ${BORDER}`,
-          borderRadius: '12px',
-          padding: '28px',
-          marginBottom: '20px',
-        }}>
-          {/* Info do aluno */}
-          <div className="review-info" style={{ marginBottom: '24px' }}>
-            {[
-              { label: 'Aluno', value: 'Maria Silva' },
-              { label: 'Turma', value: 'Inglês B2' },
-              { label: 'Data', value: '08/04/2026' },
-            ].map(({ label, value }) => (
-              <div key={label}>
-                <div style={{ color: MUTED, fontSize: '11px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '5px' }}>
-                  {label}
-                </div>
-                <div style={{ color: '#ffffff', fontSize: '15px', fontWeight: '500' }}>
-                  {value}
-                </div>
-              </div>
-            ))}
+        {loading ? (
+          <div style={{ textAlign: 'center', color: MUTED, padding: '40px 20px' }}>
+            Carregando redação...
           </div>
-
-          <div style={{ borderBottom: `1px solid ${BORDER}`, marginBottom: '24px' }} />
-
-          {/* Nota */}
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
-              Nota final
-            </label>
-            <input
-              type="number"
-              min="0"
-              max="10"
-              step="0.1"
-              value={nota}
-              onChange={(e) => setNota(parseFloat(e.target.value))}
-              style={{ ...inputStyle, width: '110px', padding: '10px 14px' }}
-              onFocus={(e) => e.target.style.borderColor = ROYAL}
-              onBlur={(e) => e.target.style.borderColor = BORDER}
-            />
+        ) : erro ? (
+          <div style={{ textAlign: 'center', color: '#ef4444', padding: '40px 20px' }}>
+            {erro}
           </div>
-
-          {/* Feedback */}
-          <div style={{ marginBottom: '24px' }}>
-            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
-              Feedback para o aluno
-            </label>
-            <textarea
-              value={feedback}
-              onChange={(e) => setFeedback(e.target.value)}
-              placeholder="Adicione comentários personalizados para o aluno..."
-              style={{
-                ...inputStyle,
-                width: '100%',
-                minHeight: '110px',
-                padding: '11px 14px',
-                fontFamily: 'inherit',
-                resize: 'vertical',
-              }}
-              onFocus={(e) => e.target.style.borderColor = ROYAL}
-              onBlur={(e) => e.target.style.borderColor = BORDER}
-            />
-          </div>
-
-          {/* Resumo de erros */}
-          <div>
-            <h3 style={{ color: '#9aaac4', fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>
-              Resumo dos erros
-            </h3>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {erros.map((error, i) => {
-                const cfg = badgeConfig[error.categoria];
-                return (
-                  <div key={i} style={{
-                    padding: '11px 14px',
-                    background: BG_ROW,
-                    borderRadius: '8px',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '10px',
-                    flexWrap: 'wrap',
-                  }}>
-                    <span style={{
-                      padding: '2px 8px',
-                      borderRadius: '20px',
-                      fontSize: '11px',
-                      fontWeight: '500',
-                      background: cfg.bg,
-                      color: cfg.color,
-                      border: `1px solid ${cfg.border}`,
-                      flexShrink: 0,
-                    }}>
-                      {error.categoria}
-                    </span>
-                    <span style={{ color: '#9aaac4', fontSize: '13px' }}>
-                      {error.erro}
-                    </span>
-                    <span style={{ color: MUTED, fontSize: '13px' }}>→</span>
-                    <span style={{ color: '#4ade80', fontSize: '13px' }}>
-                      {error.correcao}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-
-        {/* Botões de ação */}
-        <div className="review-actions">
-          <button
-            onClick={() => navigate('/correcao')}
-            style={{
-              flex: 1,
-              padding: '13px 24px',
-              background: 'transparent',
+        ) : redacao ? (
+          <>
+            {/* Card principal */}
+            <div style={{
+              background: BG_CARD,
               border: `1px solid ${BORDER}`,
-              borderRadius: '8px',
-              color: MUTED,
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              transition: 'border-color 0.15s, color 0.15s',
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.borderColor = '#2a3a5a';
-              e.currentTarget.style.color = '#ffffff';
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.borderColor = BORDER;
-              e.currentTarget.style.color = MUTED;
-            }}
-          >
-            Voltar
-          </button>
-          <button
-            onClick={handleSubmit}
-            style={{
-              flex: 1,
-              padding: '13px 24px',
-              background: ROYAL,
-              color: '#ffffff',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'background 0.15s',
-            }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#234db0'}
-            onMouseLeave={(e) => e.currentTarget.style.background = ROYAL}
-          >
-            Enviar ao aluno
-          </button>
-        </div>
+              borderRadius: '12px',
+              padding: '28px',
+              marginBottom: '20px',
+            }}>
+              {/* Info do aluno */}
+              <div className="review-info" style={{ marginBottom: '24px' }}>
+                {[
+                  { label: 'Aluno', value: redacao.alunoNome || 'N/A' },
+                  { label: 'Turma', value: redacao.nomeTurma || 'N/A' },
+                  { label: 'Data', value: redacao.dataCriacao ? new Date(redacao.dataCriacao).toLocaleDateString('pt-BR') : 'N/A' },
+                ].map(({ label, value }) => (
+                  <div key={label}>
+                    <div style={{ color: MUTED, fontSize: '11px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '5px' }}>
+                      {label}
+                    </div>
+                    <div style={{ color: '#ffffff', fontSize: '15px', fontWeight: '500' }}>
+                      {value}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{ borderBottom: `1px solid ${BORDER}`, marginBottom: '24px' }} />
+
+              {/* Nota */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+                  Nota final
+                </label>
+                <input
+                  type="number"
+                  min="0"
+                  max="10"
+                  step="0.1"
+                  value={nota}
+                  onChange={(e) => setNota(parseFloat(e.target.value) || '')}
+                  disabled={enviando}
+                  style={{ ...inputStyle, width: '110px', padding: '10px 14px' }}
+                  onFocus={(e) => e.target.style.borderColor = ROYAL}
+                  onBlur={(e) => e.target.style.borderColor = BORDER}
+                />
+              </div>
+
+              {/* Feedback */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+                  Feedback para o aluno
+                </label>
+                <textarea
+                  value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)}
+                  disabled={enviando}
+                  placeholder="Adicione comentários personalizados para o aluno..."
+                  style={{
+                    ...inputStyle,
+                    width: '100%',
+                    minHeight: '110px',
+                    padding: '11px 14px',
+                    fontFamily: 'inherit',
+                    resize: 'vertical',
+                    opacity: enviando ? 0.5 : 1,
+                  }}
+                  onFocus={(e) => e.target.style.borderColor = ROYAL}
+                  onBlur={(e) => e.target.style.borderColor = BORDER}
+                />
+              </div>
+
+              {/* Resumo de erros */}
+              {redacao.erros && redacao.erros.length > 0 && (
+                <div>
+                  <h3 style={{ color: '#9aaac4', fontSize: '12px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.6px', marginBottom: '12px' }}>
+                    Resumo dos erros
+                  </h3>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {redacao.erros.map((error, i) => {
+                      const cfg = badgeConfig[error.categoria] || { bg: 'rgba(100,100,100,0.10)', color: '#888888', border: 'rgba(100,100,100,0.25)' };
+                      return (
+                        <div key={i} style={{
+                          padding: '11px 14px',
+                          background: BG_ROW,
+                          borderRadius: '8px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '10px',
+                          flexWrap: 'wrap',
+                        }}>
+                          <span style={{
+                            padding: '2px 8px',
+                            borderRadius: '20px',
+                            fontSize: '11px',
+                            fontWeight: '500',
+                            background: cfg.bg,
+                            color: cfg.color,
+                            border: `1px solid ${cfg.border}`,
+                            flexShrink: 0,
+                          }}>
+                            {error.categoria}
+                          </span>
+                          <span style={{ color: '#9aaac4', fontSize: '13px' }}>
+                            {error.erro}
+                          </span>
+                          <span style={{ color: MUTED, fontSize: '13px' }}>→</span>
+                          <span style={{ color: '#4ade80', fontSize: '13px' }}>
+                            {error.correcao}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Botões de ação */}
+            <div className="review-actions" style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={() => navigate('/correcao')}
+                disabled={enviando}
+                style={{
+                  flex: 1,
+                  padding: '13px 24px',
+                  background: 'transparent',
+                  border: `1px solid ${BORDER}`,
+                  borderRadius: '8px',
+                  color: MUTED,
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  cursor: enviando ? 'not-allowed' : 'pointer',
+                  opacity: enviando ? 0.5 : 1,
+                  transition: 'border-color 0.15s, color 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!enviando) {
+                    e.currentTarget.style.borderColor = '#2a3a5a';
+                    e.currentTarget.style.color = '#ffffff';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!enviando) {
+                    e.currentTarget.style.borderColor = BORDER;
+                    e.currentTarget.style.color = MUTED;
+                  }
+                }}
+              >
+                Voltar
+              </button>
+              <button
+                onClick={handleSubmit}
+                disabled={enviando || !nota}
+                style={{
+                  flex: 1,
+                  padding: '13px 24px',
+                  background: (enviando || !nota) ? '#0f1a2e' : ROYAL,
+                  color: (enviando || !nota) ? MUTED : '#ffffff',
+                  border: 'none',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  fontWeight: '600',
+                  cursor: (enviando || !nota) ? 'not-allowed' : 'pointer',
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={(e) => {
+                  if (!enviando && nota) e.currentTarget.style.background = '#234db0';
+                }}
+                onMouseLeave={(e) => {
+                  if (!enviando && nota) e.currentTarget.style.background = ROYAL;
+                }}
+              >
+                {enviando ? 'Enviando...' : 'Enviar ao aluno'}
+              </button>
+            </div>
+          </>
+        ) : null}
       </div>
     </div>
   );

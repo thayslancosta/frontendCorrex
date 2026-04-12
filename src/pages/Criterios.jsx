@@ -1,15 +1,20 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { getCriterios, createCriterio, updateCriterio, deleteCriterio } from '../services/criterioService';
 
 export default function Criterios() {
   const navigate = useNavigate();
-  const [criterios, setCriterios] = useState([
-    { id: 1, nome: 'Gramática', descricao: 'Uso correto de tempos verbais, concordância e estrutura frasal', peso: 30, ativo: true },
-    { id: 2, nome: 'Vocabulário', descricao: 'Variedade e adequação do vocabulário utilizado', peso: 25, ativo: true },
-    { id: 3, nome: 'Coerência', descricao: 'Lógica e clareza na organização das ideias', peso: 25, ativo: true },
-    { id: 4, nome: 'Ortografia', descricao: 'Grafia correta das palavras', peso: 20, ativo: true },
-  ]);
+  const [criterios, setCriterios] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
+
+  useEffect(() => {
+    getCriterios()
+      .then(setCriterios)
+      .catch(() => setErro('Erro ao carregar critérios.'))
+      .finally(() => setLoading(false));
+  }, []);
 
   const [novoNome, setNovoNome] = useState('');
   const [novaDescricao, setNovaDescricao] = useState('');
@@ -17,36 +22,48 @@ export default function Criterios() {
 
   const totalPeso = criterios.reduce((sum, c) => sum + c.peso, 0);
 
-  const handleAdicionarCriterio = () => {
-    if (novoNome && novaDescricao && novoPeso) {
-      const novoCriterio = {
-        id: Math.max(...criterios.map((c) => c.id), 0) + 1,
-        nome: novoNome,
-        descricao: novaDescricao,
-        peso: parseInt(novoPeso),
-        ativo: true,
-      };
-      setCriterios([...criterios, novoCriterio]);
+  const handleAdicionarCriterio = async () => {
+    if (!novoNome || !novaDescricao || !novoPeso) return;
+    try {
+      const novo = await createCriterio({ nome: novoNome, descricao: novaDescricao, peso: parseInt(novoPeso) });
+      setCriterios((prev) => [...prev, novo]);
       setNovoNome('');
       setNovaDescricao('');
       setNovoPeso('');
+    } catch {
+      alert('Erro ao adicionar critério.');
     }
   };
 
-  const handleRemoverCriterio = (id) => {
-    setCriterios(criterios.filter((c) => c.id !== id));
+  const handleRemoverCriterio = async (id) => {
+    try {
+      await deleteCriterio(id);
+      setCriterios((prev) => prev.filter((c) => c.id !== id));
+    } catch {
+      alert('Erro ao remover critério.');
+    }
   };
 
-  const handleAtualizarPeso = (id, novoPeso) => {
-    setCriterios(
-      criterios.map((c) => (c.id === id ? { ...c, peso: novoPeso } : c))
-    );
+  const handleAtualizarPeso = async (id, novoPeso) => {
+    const criterio = criterios.find((c) => c.id === id);
+    if (!criterio) return;
+    try {
+      const atualizado = await updateCriterio(id, { ...criterio, peso: novoPeso });
+      setCriterios((prev) => prev.map((c) => (c.id === id ? atualizado : c)));
+    } catch {
+      alert('Erro ao atualizar peso.');
+    }
   };
 
-  const handleToggleAtivo = (id) => {
-    setCriterios(
-      criterios.map((c) => (c.id === id ? { ...c, ativo: !c.ativo } : c))
-    );
+  const handleToggleAtivo = async (id) => {
+    const criterio = criterios.find((c) => c.id === id);
+    if (!criterio) return;
+    try {
+      const atualizado = await updateCriterio(id, { ...criterio, ativo: !criterio.ativo });
+      setCriterios((prev) => prev.map((c) => (c.id === id ? atualizado : c)));
+    } catch {
+      alert('Erro ao atualizar critério.');
+    }
   };
 
   const indicadorColor = totalPeso === 100 ? '#34d399' : '#f59e0b';
@@ -80,6 +97,9 @@ export default function Criterios() {
           </svg>
           Voltar
         </button>
+
+        {loading && <p style={{ color: '#6b7a99', padding: '40px', textAlign: 'center' }}>Carregando critérios...</p>}
+        {erro && <p style={{ color: '#ef4444', padding: '40px', textAlign: 'center' }}>{erro}</p>}
 
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>

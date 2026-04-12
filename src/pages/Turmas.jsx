@@ -1,15 +1,38 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import { getTurmas, createTurma } from '../services/turmaService';
 
 export default function Turmas() {
   const navigate = useNavigate();
+  const [turmas, setTurmas] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [erro, setErro] = useState('');
+  const [criando, setCriando] = useState(false);
+  const [nomaNova, setNomaNova] = useState('');
+  const [showForm, setShowForm] = useState(false);
 
-  const turmas = [
-    { id: 1, nome: 'Inglês A2', alunos: 12, media: 7.1, ativa: true },
-    { id: 2, nome: 'Inglês B1', alunos: 9, media: 7.8, ativa: true },
-    { id: 3, nome: 'Inglês B2', alunos: 15, media: 8.2, ativa: true },
-    { id: 4, nome: 'Espanhol B1', alunos: 8, media: 6.9, ativa: false },
-  ];
+  useEffect(() => {
+    getTurmas()
+      .then(setTurmas)
+      .catch(() => setErro('Erro ao carregar turmas.'))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleCriarTurma = async () => {
+    if (!nomaNova.trim()) return;
+    setCriando(true);
+    try {
+      const nova = await createTurma({ nome: nomaNova.trim() });
+      setTurmas((prev) => [...prev, nova]);
+      setNomaNova('');
+      setShowForm(false);
+    } catch {
+      alert('Erro ao criar turma. Tente novamente.');
+    } finally {
+      setCriando(false);
+    }
+  };
 
   return (
     <div className="app-shell">
@@ -51,7 +74,7 @@ export default function Turmas() {
             </p>
           </div>
           <button
-            onClick={() => navigate('/turmas/nova')}
+            onClick={() => setShowForm((v) => !v)}
             style={{
               background: '#1a3a7c',
               border: 'none',
@@ -66,11 +89,69 @@ export default function Turmas() {
             onMouseEnter={(e) => e.currentTarget.style.background = '#2547a3'}
             onMouseLeave={(e) => e.currentTarget.style.background = '#1a3a7c'}
           >
-            Nova turma
+            {showForm ? 'Cancelar' : 'Nova turma'}
           </button>
         </div>
 
-        {/* Grid de Turmas */}
+        {showForm && (
+          <div style={{
+            background: '#0a0f1a',
+            border: '1px solid #1a2540',
+            borderRadius: '12px',
+            padding: '20px',
+            marginBottom: '24px',
+            display: 'flex',
+            gap: '12px',
+            alignItems: 'flex-end',
+          }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+                Nome da turma
+              </label>
+              <input
+                type="text"
+                placeholder="Ex: Inglês C1"
+                value={nomaNova}
+                onChange={(e) => setNomaNova(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleCriarTurma()}
+                style={{
+                  width: '100%',
+                  background: '#0d1424',
+                  border: '1px solid #1a2540',
+                  color: '#ffffff',
+                  padding: '10px 12px',
+                  borderRadius: '8px',
+                  fontSize: '14px',
+                  outline: 'none',
+                  boxSizing: 'border-box',
+                }}
+                onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+                onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+              />
+            </div>
+            <button
+              onClick={handleCriarTurma}
+              disabled={criando || !nomaNova.trim()}
+              style={{
+                background: criando ? '#0f2252' : '#1a3a7c',
+                border: 'none',
+                color: '#ffffff',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: criando ? 'not-allowed' : 'pointer',
+                opacity: criando ? 0.7 : 1,
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {criando ? 'Criando...' : 'Criar turma'}
+            </button>
+          </div>
+        )}
+
+        {loading && <p style={{ color: '#6b7a99', textAlign: 'center', padding: '40px' }}>Carregando turmas...</p>}
+        {erro && <p style={{ color: '#ef4444', textAlign: 'center', padding: '40px' }}>{erro}</p>}
         <div
           style={{
             display: 'grid',
@@ -124,14 +205,14 @@ export default function Turmas() {
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
                     <p style={{ fontSize: '18px', fontWeight: '700', color: '#ffffff', margin: '0' }}>
-                      {turma.alunos}
+                      {turma.totalAlunos}
                     </p>
                   </div>
                 </div>
                 <div>
                   <p style={{ fontSize: '12px', color: '#6b7a99', margin: '0 0 4px 0' }}>Média geral</p>
                   <p style={{ fontSize: '18px', fontWeight: '700', color: '#ffffff', margin: '0' }}>
-                    {turma.media.toFixed(1)}
+                    {turma.mediaGeral != null ? Number(turma.mediaGeral).toFixed(1) : '—'}
                   </p>
                 </div>
               </div>
