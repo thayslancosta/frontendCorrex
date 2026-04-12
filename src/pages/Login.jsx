@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { login } from '../services/authService';
 
 const ROYAL = '#1a3a7c';
 const ROYAL_DARK = '#122b5e';
@@ -12,10 +13,25 @@ export default function Login() {
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [senha, setSenha] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [erro, setErro] = useState('');
 
-  const handleLogin = (e) => {
+  const handleLogin = async (e) => {
     e.preventDefault();
-    navigate('/dashboard');
+    setErro('');
+    setLoading(true);
+    try {
+      await login(email, senha);
+      navigate('/dashboard');
+    } catch (err) {
+      if (err.response?.status === 401) {
+        setErro('E-mail ou senha incorretos.');
+      } else {
+        setErro('Erro ao conectar. Tente novamente.');
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -98,17 +114,35 @@ export default function Login() {
               </a>
             </div>
 
+            {erro && (
+              <div style={{
+                background: 'rgba(255, 107, 107, 0.08)',
+                border: '1px solid #ff6b6b',
+                borderRadius: '8px',
+                padding: '10px 14px',
+                marginBottom: '16px',
+                color: '#ff6b6b',
+                fontSize: '13px',
+                fontWeight: '500',
+              }}>
+                {erro}
+              </div>
+            )}
+
             <button
               type="submit"
               className="login-btn"
+              disabled={loading}
               style={{
-                background: ROYAL,
+                background: loading ? '#0f2252' : ROYAL,
                 color: '#ffffff',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.7 : 1,
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#234db0'}
-              onMouseLeave={(e) => e.currentTarget.style.background = ROYAL}
+              onMouseEnter={(e) => { if (!loading) e.currentTarget.style.background = '#234db0'; }}
+              onMouseLeave={(e) => { if (!loading) e.currentTarget.style.background = ROYAL; }}
             >
-              Entrar
+              {loading ? 'Entrando...' : 'Entrar'}
             </button>
           </form>
         </div>
