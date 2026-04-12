@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 export default function Alunos() {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const [turmaFilter, setTurmaFilter] = useState('Todas as turmas');
 

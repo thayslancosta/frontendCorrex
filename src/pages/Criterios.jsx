@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 
 export default function Criterios() {
+  const navigate = useNavigate();
   const [criterios, setCriterios] = useState([
     { id: 1, nome: 'Gramática', descricao: 'Uso correto de tempos verbais, concordância e estrutura frasal', peso: 30, ativo: true },
     { id: 2, nome: 'Vocabulário', descricao: 'Variedade e adequação do vocabulário utilizado', peso: 25, ativo: true },
