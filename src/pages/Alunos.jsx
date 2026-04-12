@@ -12,17 +12,35 @@ export default function Alunos() {
   const [erro, setErro] = useState('');
 
   useEffect(() => {
-    getAlunos()
-      .then(setAlunos)
-      .catch(() => setErro('Erro ao carregar alunos.'))
-      .finally(() => setLoading(false));
+    const carregarAlunos = async () => {
+      try {
+        const dados = await getAlunos();
+        console.log('Alunos carregados:', dados);
+        
+        // Se dados é um objeto com propriedade 'data', usar dados.data
+        const alunosArray = Array.isArray(dados) ? dados : (dados?.data || []);
+        setAlunos(alunosArray);
+        
+        if (!alunosArray || alunosArray.length === 0) {
+          console.log('Nenhum aluno retornado pela API');
+        }
+      } catch (err) {
+        console.error('Erro ao carregar alunos:', err);
+        setErro(err.response?.data?.message || 'Erro ao carregar alunos.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    carregarAlunos();
   }, []);
 
-  const turmas = ['Todas as turmas', ...new Set(alunos.map((a) => a.nomeTurma))];
+  const turmas = ['Todas as turmas', ...new Set(alunos.filter(a => a?.nomeTurma).map((a) => a.nomeTurma))];
 
   const filteredAlunos = alunos.filter((aluno) => {
-    const matchesSearch = aluno.nome.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTurma = turmaFilter === 'Todas as turmas' || aluno.nomeTurma === turmaFilter;
+    if (!aluno?.nome) return false;
+    const matchesSearch = (aluno.nome || '').toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesTurma = turmaFilter === 'Todas as turmas' || (aluno.nomeTurma === turmaFilter);
     return matchesSearch && matchesTurma;
   });
 
@@ -175,9 +193,40 @@ export default function Alunos() {
         )}
 
         {erro && (
-          <p style={{ color: '#ef4444', padding: '40px', textAlign: 'center' }}>
-            {erro}
-          </p>
+          <div style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '60vh',
+            color: '#ef4444',
+            padding: '40px',
+            textAlign: 'center',
+          }}>
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ marginBottom: '16px' }}>
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="8" x2="12" y2="12"></line>
+              <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <p style={{ margin: '0 0 8px 0', fontSize: '16px', fontWeight: '600' }}>Erro ao carregar</p>
+            <p style={{ margin: '0', fontSize: '14px', color: '#ef4444' }}>{erro}</p>
+            <button
+              onClick={() => window.location.reload()}
+              style={{
+                marginTop: '16px',
+                padding: '8px 16px',
+                background: '#ef4444',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '13px',
+                fontWeight: '600',
+              }}
+            >
+              Tentar novamente
+            </button>
+          </div>
         )}
 
         {!loading && !erro && (
@@ -238,11 +287,11 @@ export default function Alunos() {
                           {aluno.nome}
                         </div>
                       </td>
-                      <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.nomeTurma}</td>
+                      <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.nomeTurma || '—'}</td>
                       <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
                         {aluno.mediaGeral != null ? Number(aluno.mediaGeral).toFixed(1) : '—'}
                       </td>
-                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.totalRedacoes}</td>
+                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.totalRedacoes || 0}</td>
                       <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
                       <td style={{ padding: '12px' }}>
                         <button
