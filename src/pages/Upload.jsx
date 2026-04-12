@@ -354,8 +354,7 @@ export default function Upload() {
 
         {/* Botão */}
         <button
-          onClick={() => navigate('/correcao')}
-          disabled=async () => {
+          onClick={async () => {
             if (!turma || !idioma) { alert('Selecione turma e idioma.'); return; }
             setEnviando(true);
             try {
@@ -410,6 +409,7 @@ export default function Upload() {
           }}
         >
           {enviando ? 'Enviando...' : 'Enviar para correção'}
+        </button>
       </div>
     </div>
   );
