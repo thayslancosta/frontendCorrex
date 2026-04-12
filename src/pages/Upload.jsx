@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getTurmas } from '../services/turmaService';
+import { getAlunos } from '../services/alunoService';
 import { enviarRedacaoTexto, enviarRedacaoArquivo } from '../services/redacaoService';
+import api from '../services/api';
 
 const ROYAL = '#1a3a7c';
 const BORDER = '#1a2540';
@@ -38,15 +40,54 @@ export default function Upload() {
   const [idioma, setIdioma] = useState('');
   const [files, setFiles] = useState([]);
   const [dragActive, setDragActive] = useState(false);
-  const [nomeAluno, setNomeAluno] = useState('');
   const [textoDigitado, setTextoDigitado] = useState('');
   const [turmas, setTurmas] = useState([]);
   const [enviando, setEnviando] = useState(false);
   const [rawFiles, setRawFiles] = useState([]);
+  const [alunos, setAlunos] = useState([]);
+  const [alunoId, setAlunoId] = useState('');
+  const [showNovoAluno, setShowNovoAluno] = useState(false);
+  const [novoAlunoNome, setNovoAlunoNome] = useState('');
+  const [novoAlunoEmail, setNovoAlunoEmail] = useState('');
+  const [novoAlunoTurmaId, setNovoAlunoTurmaId] = useState('');
+  const [criandoAluno, setCriandoAluno] = useState(false);
+  const [erroAluno, setErroAluno] = useState('');
 
   useEffect(() => {
     getTurmas().then(setTurmas).catch(() => {});
+    getAlunos()
+      .then((data) => {
+        const lista = Array.isArray(data) ? data : (data.content ?? []);
+        setAlunos(lista);
+      })
+      .catch(() => {});
   }, []);
+
+  const handleCriarAluno = async () => {
+    if (!novoAlunoNome.trim() || !novoAlunoTurmaId) {
+      setErroAluno('Nome e turma são obrigatórios.');
+      return;
+    }
+    setCriandoAluno(true);
+    setErroAluno('');
+    try {
+      const { data } = await api.post('/alunos', {
+        nome: novoAlunoNome.trim(),
+        email: novoAlunoEmail.trim() || undefined,
+        turmaId: parseInt(novoAlunoTurmaId),
+      });
+      setAlunos((prev) => [...prev, data]);
+      setAlunoId(String(data.id));
+      setShowNovoAluno(false);
+      setNovoAlunoNome('');
+      setNovoAlunoEmail('');
+      setNovoAlunoTurmaId('');
+    } catch {
+      setErroAluno('Erro ao criar aluno. Verifique os dados.');
+    } finally {
+      setCriandoAluno(false);
+    }
+  };
 
   const handleDrag = (e) => {
     e.preventDefault();
@@ -130,6 +171,158 @@ export default function Upload() {
               <option value="fr">Francês</option>
             </select>
           </div>
+        </div>
+
+        {/* Seleção de Aluno */}
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
+            Aluno
+          </label>
+
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <select
+              value={alunoId}
+              onChange={(e) => setAlunoId(e.target.value)}
+              style={{ ...selectStyle, flex: 1 }}
+            >
+              <option value="">Selecione um aluno</option>
+              {alunos.map((a) => (
+                <option key={a.id} value={String(a.id)}>{a.nome} — {a.nomeTurma}</option>
+              ))}
+            </select>
+
+            <button
+              onClick={() => { setShowNovoAluno((v) => !v); setErroAluno(''); }}
+              style={{
+                background: 'transparent',
+                border: `1px solid ${BORDER}`,
+                color: '#4a7cff',
+                padding: '11px 16px',
+                borderRadius: '8px',
+                fontSize: '13px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                whiteSpace: 'nowrap',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = BORDER}
+            >
+              {showNovoAluno ? 'Cancelar' : '+ Novo aluno'}
+            </button>
+          </div>
+
+          {/* Mini-formulário de criação de aluno */}
+          {showNovoAluno && (
+            <div style={{
+              marginTop: '12px',
+              background: '#0a0f1a',
+              border: `1px solid ${BORDER}`,
+              borderRadius: '12px',
+              padding: '20px',
+            }}>
+              <p style={{ color: '#9aaac4', fontSize: '13px', fontWeight: '600', margin: '0 0 16px 0' }}>
+                Criar novo aluno
+              </p>
+
+              {erroAluno && (
+                <div style={{
+                  background: 'rgba(255,107,107,0.08)',
+                  border: '1px solid #ff6b6b',
+                  borderRadius: '8px',
+                  padding: '8px 12px',
+                  marginBottom: '12px',
+                  color: '#ff6b6b',
+                  fontSize: '13px',
+                }}>
+                  {erroAluno}
+                </div>
+              )}
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
+                <div>
+                  <label style={{ display: 'block', color: '#9aaac4', fontSize: '12px', marginBottom: '5px' }}>Nome *</label>
+                  <input
+                    type="text"
+                    placeholder="Ex: Maria Silva"
+                    value={novoAlunoNome}
+                    onChange={(e) => setNovoAlunoNome(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      background: BG_INPUT,
+                      border: `1px solid ${BORDER}`,
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: '13px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = ROYAL}
+                    onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+                  />
+                </div>
+
+                <div>
+                  <label style={{ display: 'block', color: '#9aaac4', fontSize: '12px', marginBottom: '5px' }}>Email (opcional)</label>
+                  <input
+                    type="email"
+                    placeholder="Ex: maria@email.com"
+                    value={novoAlunoEmail}
+                    onChange={(e) => setNovoAlunoEmail(e.target.value)}
+                    style={{
+                      width: '100%',
+                      padding: '9px 12px',
+                      background: BG_INPUT,
+                      border: `1px solid ${BORDER}`,
+                      borderRadius: '8px',
+                      color: '#ffffff',
+                      fontSize: '13px',
+                      outline: 'none',
+                      boxSizing: 'border-box',
+                    }}
+                    onFocus={(e) => e.currentTarget.style.borderColor = ROYAL}
+                    onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
+                  />
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', color: '#9aaac4', fontSize: '12px', marginBottom: '5px' }}>Turma *</label>
+                  <select
+                    value={novoAlunoTurmaId}
+                    onChange={(e) => setNovoAlunoTurmaId(e.target.value)}
+                    style={{ ...selectStyle }}
+                  >
+                    <option value="">Selecione uma turma</option>
+                    {turmas.map((t) => (
+                      <option key={t.id} value={String(t.id)}>{t.nome}</option>
+                    ))}
+                  </select>
+                </div>
+
+                <button
+                  onClick={handleCriarAluno}
+                  disabled={criandoAluno}
+                  style={{
+                    background: criandoAluno ? '#0f2252' : ROYAL,
+                    border: 'none',
+                    color: '#ffffff',
+                    padding: '10px 20px',
+                    borderRadius: '8px',
+                    fontSize: '13px',
+                    fontWeight: '600',
+                    cursor: criandoAluno ? 'not-allowed' : 'pointer',
+                    opacity: criandoAluno ? 0.7 : 1,
+                    whiteSpace: 'nowrap',
+                  }}
+                >
+                  {criandoAluno ? 'Criando...' : 'Criar aluno'}
+                </button>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Tabs */}
@@ -288,33 +481,6 @@ export default function Upload() {
 
         {modoEntrada === 'texto' && (
           <>
-            {/* Campo Nome do Aluno */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
-                Nome do aluno
-              </label>
-              <input
-                type="text"
-                placeholder="Ex: Maria Silva"
-                value={nomeAluno}
-                onChange={(e) => setNomeAluno(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '11px 14px',
-                  background: BG_INPUT,
-                  border: `1px solid ${BORDER}`,
-                  borderRadius: '8px',
-                  color: '#ffffff',
-                  fontSize: '14px',
-                  outline: 'none',
-                  boxSizing: 'border-box',
-                  transition: 'border-color 0.2s',
-                }}
-                onFocus={(e) => e.currentTarget.style.borderColor = ROYAL}
-                onBlur={(e) => e.currentTarget.style.borderColor = BORDER}
-              />
-            </div>
-
             {/* Campo Redação */}
             <div style={{ marginBottom: '12px' }}>
               <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
@@ -356,12 +522,13 @@ export default function Upload() {
         <button
           onClick={async () => {
             if (!turma || !idioma) { alert('Selecione turma e idioma.'); return; }
+            if (!alunoId) { alert('Selecione um aluno.'); return; }
             setEnviando(true);
             try {
               let data;
               if (modoEntrada === 'texto') {
                 data = await enviarRedacaoTexto({
-                  alunoNome: nomeAluno.trim(),
+                  alunoId: parseInt(alunoId),
                   turmaId: parseInt(turma),
                   idioma,
                   texto: textoDigitado.trim(),
@@ -369,6 +536,7 @@ export default function Upload() {
               } else {
                 const formData = new FormData();
                 rawFiles.forEach((f) => formData.append('arquivo', f));
+                formData.append('alunoId', alunoId);
                 formData.append('turmaId', turma);
                 formData.append('idioma', idioma);
                 data = await enviarRedacaoArquivo(formData);
@@ -380,31 +548,31 @@ export default function Upload() {
               setEnviando(false);
             }
           }}
-          disabled={enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))}
+          disabled={enviando || !alunoId || (modoEntrada === 'arquivo' ? files.length === 0 : textoDigitado.trim() === '')}
           style={{
             width: '100%',
             padding: '13px 24px',
-            background: (enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? '#0f1a2e' : ROYAL,
-            color: (enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? MUTED : '#ffffff',
-            border: `1px solid ${(enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? BORDER : ROYAL}`,
+            background: (enviando || !alunoId || (modoEntrada === 'arquivo' ? files.length === 0 : textoDigitado.trim() === '')) ? '#0f1a2e' : ROYAL,
+            color: (enviando || !alunoId || (modoEntrada === 'arquivo' ? files.length === 0 : textoDigitado.trim() === '')) ? MUTED : '#ffffff',
+            border: `1px solid ${(enviando || !alunoId || (modoEntrada === 'arquivo' ? files.length === 0 : textoDigitado.trim() === '')) ? BORDER : ROYAL}`,
             borderRadius: '8px',
             fontSize: '14px',
             fontWeight: '600',
-            cursor: (enviando || (modoEntrada === 'arquivo' ? files.length === 0 : (nomeAluno.trim() === '' || textoDigitado.trim() === ''))) ? 'not-allowed' : 'pointer',
+            cursor: (enviando || !alunoId || (modoEntrada === 'arquivo' ? files.length === 0 : textoDigitado.trim() === '')) ? 'not-allowed' : 'pointer',
             transition: 'background 0.15s',
           }}
           onMouseEnter={(e) => {
             if (modoEntrada === 'arquivo') {
-              if (files.length > 0 && !enviando) e.currentTarget.style.background = '#234db0';
+              if (files.length > 0 && alunoId && !enviando) e.currentTarget.style.background = '#234db0';
             } else {
-              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '' && !enviando) e.currentTarget.style.background = '#234db0';
+              if (alunoId && textoDigitado.trim() !== '' && !enviando) e.currentTarget.style.background = '#234db0';
             }
           }}
           onMouseLeave={(e) => {
             if (modoEntrada === 'arquivo') {
-              if (files.length > 0 && !enviando) e.currentTarget.style.background = ROYAL;
+              if (files.length > 0 && alunoId && !enviando) e.currentTarget.style.background = ROYAL;
             } else {
-              if (nomeAluno.trim() !== '' && textoDigitado.trim() !== '' && !enviando) e.currentTarget.style.background = ROYAL;
+              if (alunoId && textoDigitado.trim() !== '' && !enviando) e.currentTarget.style.background = ROYAL;
             }
           }}
         >
