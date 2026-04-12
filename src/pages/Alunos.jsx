@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getAlunos } from '../services/alunoService';
+import api from '../services/api';
+import { getTurmas } from '../services/turmaService';
 
 export default function Alunos() {
   const navigate = useNavigate();
@@ -10,22 +12,21 @@ export default function Alunos() {
   const [alunos, setAlunos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [turmasSelect, setTurmasSelect] = useState([]);
+  const [novoNome, setNovoNome] = useState('');
+  const [novoEmail, setNovoEmail] = useState('');
+  const [novaTurmaId, setNovaTurmaId] = useState('');
+  const [salvando, setSalvando] = useState(false);
+  const [erroModal, setErroModal] = useState('');
 
   useEffect(() => {
     const carregarAlunos = async () => {
       try {
         const dados = await getAlunos();
-        console.log('Alunos carregados:', dados);
-        
-        // Se dados é um objeto com propriedade 'data', usar dados.data
         const alunosArray = Array.isArray(dados) ? dados : (dados?.data || []);
         setAlunos(alunosArray);
-        
-        if (!alunosArray || alunosArray.length === 0) {
-          console.log('Nenhum aluno retornado pela API');
-        }
       } catch (err) {
-        console.error('Erro ao carregar alunos:', err);
         setErro(err.response?.data?.message || 'Erro ao carregar alunos.');
       } finally {
         setLoading(false);
@@ -34,6 +35,37 @@ export default function Alunos() {
     
     carregarAlunos();
   }, []);
+
+  useEffect(() => {
+    getTurmas()
+      .then(setTurmasSelect)
+      .catch(() => {});
+  }, []);
+
+  const handleCriarAluno = async () => {
+    if (!novoNome.trim() || !novaTurmaId) {
+      setErroModal('Nome e turma são obrigatórios.');
+      return;
+    }
+    setSalvando(true);
+    setErroModal('');
+    try {
+      const { data } = await api.post('/alunos', {
+        nome: novoNome.trim(),
+        email: novoEmail.trim() || undefined,
+        turmaId: parseInt(novaTurmaId),
+      });
+      setAlunos((prev) => [...prev, data]);
+      setShowModal(false);
+      setNovoNome('');
+      setNovoEmail('');
+      setNovaTurmaId('');
+    } catch {
+      setErroModal('Erro ao cadastrar aluno. Verifique os dados.');
+    } finally {
+      setSalvando(false);
+    }
+  };
 
   const turmas = ['Todas as turmas', ...new Set(alunos.filter(a => a?.nomeTurma).map((a) => a.nomeTurma))];
 
@@ -86,9 +118,29 @@ export default function Alunos() {
 
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff', margin: '0 0 8px 0' }}>
-            Alunos
-          </h1>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff', margin: '0' }}>
+              Alunos
+            </h1>
+            <button
+              onClick={() => setShowModal(true)}
+              style={{
+                background: '#1a3a7c',
+                border: 'none',
+                color: '#ffffff',
+                padding: '10px 20px',
+                borderRadius: '8px',
+                fontSize: '14px',
+                fontWeight: '600',
+                cursor: 'pointer',
+                transition: 'background 0.2s',
+              }}
+              onMouseEnter={(e) => e.currentTarget.style.background = '#2547a3'}
+              onMouseLeave={(e) => e.currentTarget.style.background = '#1a3a7c'}
+            >
+              + Novo aluno
+            </button>
+          </div>
           <p style={{ fontSize: '14px', color: '#6b7a99', margin: '0 0 24px 0' }}>
             Busque e gerencie seus alunos
           </p>
@@ -329,7 +381,199 @@ export default function Alunos() {
             )}
           </>
         )}
-      </div>
+        {/* Modal Novo Aluno */}
+        {showModal && (
+          <div
+            style={{
+              position: 'fixed',
+              inset: 0,
+              background: 'rgba(0,0,0,0.6)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+            }}
+            onClick={(e) => { if (e.target === e.currentTarget) setShowModal(false); }}
+          >
+            <div
+              style={{
+                background: '#0a0f1a',
+                border: '1px solid #1a2540',
+                borderRadius: '16px',
+                padding: '32px',
+                width: '100%',
+                maxWidth: '480px',
+                boxShadow: '0 24px 48px rgba(0,0,0,0.4)',
+              }}
+            >
+              {/* Header do Modal */}
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <h2 style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700', margin: 0 }}>
+                  Novo aluno
+                </h2>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    background: 'transparent',
+                    border: 'none',
+                    color: '#6b7a99',
+                    fontSize: '20px',
+                    cursor: 'pointer',
+                    lineHeight: 1,
+                    padding: '4px',
+                  }}
+                  onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+                  onMouseLeave={(e) => e.currentTarget.style.color = '#6b7a99'}
+                >
+                  ×
+                </button>
+              </div>
+
+              {/* Erro do Modal */}
+              {erroModal && (
+                <div style={{
+                  background: 'rgba(255,107,107,0.08)',
+                  border: '1px solid #ff6b6b',
+                  borderRadius: '8px',
+                  padding: '10px 14px',
+                  marginBottom: '16px',
+                  color: '#ff6b6b',
+                  fontSize: '13px',
+                }}>
+                  {erroModal}
+                </div>
+              )}
+
+              {/* Campo Nome */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+                  Nome *
+                </label>
+                <input
+                  type="text"
+                  placeholder="Ex: Maria Silva"
+                  value={novoNome}
+                  onChange={(e) => setNovoNome(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#0d1424',
+                    border: '1px solid #1a2540',
+                    color: '#ffffff',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+                />
+              </div>
+
+              {/* Campo Email */}
+              <div style={{ marginBottom: '16px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+                  Email <span style={{ fontWeight: '400', color: '#4a5568' }}>(opcional)</span>
+                </label>
+                <input
+                  type="email"
+                  placeholder="Ex: maria@email.com"
+                  value={novoEmail}
+                  onChange={(e) => setNovoEmail(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#0d1424',
+                    border: '1px solid #1a2540',
+                    color: '#ffffff',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    boxSizing: 'border-box',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+                />
+              </div>
+
+              {/* Campo Turma */}
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+                  Turma *
+                </label>
+                <select
+                  value={novaTurmaId}
+                  onChange={(e) => setNovaTurmaId(e.target.value)}
+                  style={{
+                    width: '100%',
+                    background: '#0d1424',
+                    border: '1px solid #1a2540',
+                    color: novaTurmaId ? '#ffffff' : '#6b7a99',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    fontSize: '14px',
+                    outline: 'none',
+                    cursor: 'pointer',
+                    transition: 'border-color 0.2s',
+                  }}
+                  onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+                  onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+                >
+                  <option value="">Selecione uma turma</option>
+                  {turmasSelect.map((t) => (
+                    <option key={t.id} value={String(t.id)}>{t.nome}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Botões */}
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  onClick={() => setShowModal(false)}
+                  style={{
+                    flex: 1,
+                    padding: '11px',
+                    background: 'transparent',
+                    border: '1px solid #1a2540',
+                    borderRadius: '8px',
+                    color: '#6b7a99',
+                    fontSize: '14px',
+                    fontWeight: '500',
+                    cursor: 'pointer',
+                    transition: 'all 0.2s',
+                  }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#2a3a5a'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#1a2540'; e.currentTarget.style.color = '#6b7a99'; }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={handleCriarAluno}
+                  disabled={salvando}
+                  style={{
+                    flex: 1,
+                    padding: '11px',
+                    background: salvando ? '#0f2252' : '#1a3a7c',
+                    border: 'none',
+                    borderRadius: '8px',
+                    color: '#ffffff',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                    cursor: salvando ? 'not-allowed' : 'pointer',
+                    opacity: salvando ? 0.7 : 1,
+                    transition: 'background 0.2s',
+                  }}
+                  onMouseEnter={(e) => { if (!salvando) e.currentTarget.style.background = '#2547a3'; }}
+                  onMouseLeave={(e) => { if (!salvando) e.currentTarget.style.background = '#1a3a7c'; }}
+                >
+                  {salvando ? 'Cadastrando...' : 'Cadastrar aluno'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}      </div>
     </div>
   );
 }
