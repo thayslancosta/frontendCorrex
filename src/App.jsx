@@ -7,6 +7,7 @@ import Revisao from './pages/Revisao'
 import Turmas from './pages/Turmas'
 import Alunos from './pages/Alunos'
 import Criterios from './pages/Criterios'
+import RedacoesAluno from './pages/RedacoesAluno'
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
         <Route path="/turmas" element={<Turmas />} />
         <Route path="/alunos" element={<Alunos />} />
         <Route path="/criterios" element={<Criterios />} />
+        <Route path="/redacoes-aluno" element={<RedacoesAluno />} />
       </Routes>
     </BrowserRouter>
   )

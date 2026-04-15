@@ -14,7 +14,10 @@ export default function Turmas() {
 
   useEffect(() => {
     getTurmas()
-      .then(setTurmas)
+      .then((dados) => {
+        const lista = Array.isArray(dados) ? dados : (dados?.content || dados || []);
+        setTurmas(lista);
+      })
       .catch(() => setErro('Erro ao carregar turmas.'))
       .finally(() => setLoading(false));
   }, []);

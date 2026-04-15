@@ -56,7 +56,7 @@ export default function Dashboard() {
     { label: 'Total de correções', value: String(dados.totalCorrecoes),        Icon: IconCorrections, accent: '#1a3a7c' },
     { label: 'Alunos ativos',      value: String(dados.alunosAtivos),          Icon: IconStudents,    accent: '#0f5a3a' },
     { label: 'Média geral',        value: Number(dados.mediaGeral).toFixed(1), Icon: IconAverage,     accent: '#7a4a00' },
-    { label: 'Pendentes',          value: String(dados.correcoesPendentes),    Icon: IconPending,     accent: '#7a1a1a' },
+    { label: 'Pendentes',          value: String(dados.pendentes ?? 0),        Icon: IconPending,     accent: '#7a1a1a' },
   ] : [];
 
   const recentCorrections = dados?.correcoesRecentes ?? [];
@@ -69,8 +69,9 @@ export default function Dashboard() {
 
   const labelStatus = (status) => {
     if (status === 'CORRIGIDA') return 'Corrigida';
+    if (status === 'REVISADA')  return 'Revisada';
     if (status === 'PENDENTE')  return 'Pendente';
-    return 'Em correção';
+    return 'Pendente';
   };
 
   if (loading) return (
@@ -178,14 +179,14 @@ export default function Dashboard() {
                     onMouseEnter={(e) => e.currentTarget.style.background = '#0d1424'}
                     onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                   >
-                    <td style={{ padding: '10px', color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{item.nomeAluno}</td>
-                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.nomeTurma}</td>
-                    <td style={{ padding: '10px', color: item.notaFinal != null ? '#ffffff' : MUTED, fontSize: '13px', fontWeight: '600' }}>
-                      {item.notaFinal != null ? Number(item.notaFinal).toFixed(1) : '—'}
+                    <td style={{ padding: '10px', color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{item.aluno}</td>
+                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.turma}</td>
+                    <td style={{ padding: '10px', color: item.nota != null ? '#ffffff' : MUTED, fontSize: '13px', fontWeight: '600' }}>
+                      {item.nota != null ? Number(item.nota).toFixed(1) : '—'}
                     </td>
-                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{formatarData(item.dataEnvio)}</td>
+                    <td style={{ padding: '10px', color: MUTED, fontSize: '12px' }}>{item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '—'}</td>
                     <td style={{ padding: '10px' }}>
-                      <span className={`badge badge-${item.status === 'CORRIGIDA' ? 'success' : 'warning'}`}>
+                      <span className={`badge badge-${item.status === 'CORRIGIDA' || item.status === 'REVISADA' ? 'success' : 'warning'}`}>
                         {labelStatus(item.status)}
                       </span>
                     </td>

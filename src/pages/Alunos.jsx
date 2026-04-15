@@ -24,7 +24,7 @@ export default function Alunos() {
     const carregarAlunos = async () => {
       try {
         const dados = await getAlunos();
-        const alunosArray = Array.isArray(dados) ? dados : (dados?.data || []);
+        const alunosArray = Array.isArray(dados) ? dados : (dados?.content || []);
         setAlunos(alunosArray);
       } catch (err) {
         setErro(err.response?.data?.message || 'Erro ao carregar alunos.');
@@ -67,12 +67,12 @@ export default function Alunos() {
     }
   };
 
-  const turmas = ['Todas as turmas', ...new Set(alunos.filter(a => a?.nomeTurma).map((a) => a.nomeTurma))];
+  const turmas = ['Todas as turmas', ...new Set(alunos.filter(a => a?.turma).map((a) => a.turma))];
 
   const filteredAlunos = alunos.filter((aluno) => {
     if (!aluno?.nome) return false;
     const matchesSearch = (aluno.nome || '').toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesTurma = turmaFilter === 'Todas as turmas' || (aluno.nomeTurma === turmaFilter);
+    const matchesTurma = turmaFilter === 'Todas as turmas' || (aluno.turma === turmaFilter);
     return matchesSearch && matchesTurma;
   });
 
@@ -347,6 +347,7 @@ export default function Alunos() {
                       <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
                       <td style={{ padding: '12px' }}>
                         <button
+                          onClick={() => navigate('/redacoes-aluno', { state: { alunoId: aluno.id, alunoNome: aluno.nome } })}
                           style={{
                             background: 'transparent',
                             border: '1px solid #1a3a7c',

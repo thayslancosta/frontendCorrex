@@ -11,7 +11,10 @@ export default function Criterios() {
 
   useEffect(() => {
     getCriterios()
-      .then(setCriterios)
+      .then((dados) => {
+        const lista = Array.isArray(dados) ? dados : (dados?.content || dados || []);
+        setCriterios(lista);
+      })
       .catch(() => setErro('Erro ao carregar critérios.'))
       .finally(() => setLoading(false));
   }, []);
