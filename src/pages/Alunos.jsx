@@ -76,11 +76,11 @@ export default function Alunos() {
     return matchesSearch && matchesTurma;
   });
 
-  const formatarData = (iso) => {
-    if (!iso) return '—';
-    const [y, m, d] = iso.split('-');
-    return `${d}/${m}/${y}`;
-  };
+const formatarData = (iso) => {
+  if (!iso) return '—';
+  try { return new Date(iso).toLocaleDateString('pt-BR'); }
+  catch { return '—'; }
+};
 
   const getInitials = (nome) => {
     const parts = nome.split(' ');
@@ -100,15 +100,15 @@ export default function Alunos() {
             gap: '6px',
             background: 'transparent',
             border: 'none',
-            color: '#6b7a99',
+            color: 'var(--text-secondary)',
             fontSize: '13px',
             cursor: 'pointer',
             padding: '0',
             marginBottom: '20px',
             transition: 'color 0.2s',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#6b7a99'}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -119,15 +119,15 @@ export default function Alunos() {
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff', margin: '0' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', margin: '0' }}>
               Alunos
             </h1>
             <button
               onClick={() => setShowModal(true)}
               style={{
-                background: '#1a3a7c',
+                background: 'var(--accent)',
                 border: 'none',
-                color: '#ffffff',
+                color: 'var(--text-primary)',
                 padding: '10px 20px',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -135,13 +135,13 @@ export default function Alunos() {
                 cursor: 'pointer',
                 transition: 'background 0.2s',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.background = '#2547a3'}
-              onMouseLeave={(e) => e.currentTarget.style.background = '#1a3a7c'}
+              onMouseEnter={(e) => e.currentTarget.style.background = 'var(--accent-hover)'}
+              onMouseLeave={(e) => e.currentTarget.style.background = 'var(--accent)'}
             >
               + Novo aluno
             </button>
           </div>
-          <p style={{ fontSize: '14px', color: '#6b7a99', margin: '0 0 24px 0' }}>
+          <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0 0 24px 0' }}>
             Busque e gerencie seus alunos
           </p>
 
@@ -154,7 +154,7 @@ export default function Alunos() {
                 height="16"
                 viewBox="0 0 24 24"
                 fill="none"
-                stroke="#6b7a99"
+                stroke="var(--text-secondary)"
                 strokeWidth="2"
                 style={{
                   position: 'absolute',
@@ -174,17 +174,17 @@ export default function Alunos() {
                 onChange={(e) => setSearchTerm(e.target.value)}
                 style={{
                   width: '100%',
-                  background: '#0d1424',
-                  border: '1px solid #1a2540',
-                  color: '#ffffff',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
                   padding: '10px 12px 10px 40px',
                   borderRadius: '8px',
                   fontSize: '14px',
                   transition: 'all 0.2s',
                   outline: 'none',
                 }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
               />
             </div>
 
@@ -193,9 +193,9 @@ export default function Alunos() {
               value={turmaFilter}
               onChange={(e) => setTurmaFilter(e.target.value)}
               style={{
-                background: '#0d1424',
-                border: '1px solid #1a2540',
-                color: '#ffffff',
+                background: 'var(--bg-surface)',
+                border: '1px solid var(--border)',
+                color: 'var(--text-primary)',
                 padding: '10px 12px',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -203,8 +203,8 @@ export default function Alunos() {
                 minWidth: '180px',
                 transition: 'all 0.2s',
               }}
-              onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
-              onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+              onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+              onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
             >
               {turmas.map((turma) => (
                 <option key={turma} value={turma}>
@@ -221,14 +221,14 @@ export default function Alunos() {
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '60vh',
-            color: '#6b7a99',
+            color: 'var(--text-secondary)',
           }}>
             <div style={{ textAlign: 'center' }}>
               <div style={{
                 width: '40px',
                 height: '40px',
-                border: '3px solid #1a2540',
-                borderTop: '3px solid #4a7cff',
+                border: '3px solid var(--border)',
+                borderTop: '3px solid var(--text-link)',
                 borderRadius: '50%',
                 animation: 'spin 1s linear infinite',
                 margin: '0 auto 16px',
@@ -251,7 +251,7 @@ export default function Alunos() {
             alignItems: 'center',
             justifyContent: 'center',
             minHeight: '60vh',
-            color: '#ef4444',
+            color: 'var(--error)',
             padding: '40px',
             textAlign: 'center',
           }}>
@@ -267,8 +267,8 @@ export default function Alunos() {
               style={{
                 marginTop: '16px',
                 padding: '8px 16px',
-                background: '#ef4444',
-                color: '#ffffff',
+                background: 'var(--error)',
+                color: 'var(--text-primary)',
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',
@@ -295,16 +295,16 @@ export default function Alunos() {
                 <thead>
                   <tr
                     style={{
-                      borderBottom: '1px solid #1a2540',
-                      backgroundColor: '#0a0f1a',
+                      borderBottom: '1px solid var(--border)',
+                      backgroundColor: 'var(--bg-base)',
                     }}
                   >
-                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Nome</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Turma</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Média</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Redações</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Última atividade</th>
-                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#6b7a99' }}>Ação</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Nome</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Turma</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Média</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Redações</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Última atividade</th>
+                    <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' }}>Ação</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -312,26 +312,26 @@ export default function Alunos() {
                     <tr
                       key={index}
                       style={{
-                        borderBottom: '1px solid #1a2540',
+                        borderBottom: '1px solid var(--border)',
                         transition: 'all 0.2s',
                       }}
                       onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(26, 58, 124, 0.08)'}
                       onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                     >
-                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
+                      <td style={{ padding: '12px', color: 'var(--text-primary)', fontSize: '14px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                           <div
                             style={{
                               width: '32px',
                               height: '32px',
                               borderRadius: '50%',
-                              background: '#1a3a7c',
-                              display: 'flex',
-                              alignItems: 'center',
-                              justifyContent: 'center',
-                              fontSize: '12px',
-                              fontWeight: '700',
-                              color: '#4a7cff',
+                            background: 'var(--accent)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            fontSize: '12px',
+                            fontWeight: '700',
+                            color: 'var(--text-link)',
                             }}
                           >
                             {getInitials(aluno.nome)}
@@ -339,19 +339,19 @@ export default function Alunos() {
                           {aluno.nome}
                         </div>
                       </td>
-                      <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{aluno.nomeTurma || '—'}</td>
-                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>
+                      <td style={{ padding: '12px', color: 'var(--text-secondary)', fontSize: '14px' }}>{aluno.nomeTurma || '—'}</td>
+                      <td style={{ padding: '12px', color: 'var(--text-primary)', fontSize: '14px' }}>
                         {aluno.mediaGeral != null ? Number(aluno.mediaGeral).toFixed(1) : '—'}
                       </td>
-                      <td style={{ padding: '12px', color: '#ffffff', fontSize: '14px' }}>{aluno.totalRedacoes || 0}</td>
-                      <td style={{ padding: '12px', color: '#6b7a99', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
+                      <td style={{ padding: '12px', color: 'var(--text-primary)', fontSize: '14px' }}>{aluno.totalRedacoes || 0}</td>
+                      <td style={{ padding: '12px', color: 'var(--text-secondary)', fontSize: '14px' }}>{formatarData(aluno.ultimaAtividade)}</td>
                       <td style={{ padding: '12px' }}>
                         <button
                           onClick={() => navigate('/redacoes-aluno', { state: { alunoId: aluno.id, alunoNome: aluno.nome } })}
                           style={{
                             background: 'transparent',
-                            border: '1px solid #1a3a7c',
-                            color: '#4a7cff',
+                            border: '1px solid var(--accent)',
+                            color: 'var(--text-link)',
                             padding: '6px 12px',
                             borderRadius: '6px',
                             fontSize: '12px',
@@ -376,7 +376,7 @@ export default function Alunos() {
             </div>
 
             {filteredAlunos.length === 0 && (
-              <div style={{ textAlign: 'center', padding: '40px', color: '#6b7a99' }}>
+              <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-tertiary)' }}>
                 Nenhum aluno encontrado.
               </div>
             )}
@@ -398,8 +398,8 @@ export default function Alunos() {
           >
             <div
               style={{
-                background: '#0a0f1a',
-                border: '1px solid #1a2540',
+                background: 'var(--bg-base)',
+                border: '1px solid var(--border)',
                 borderRadius: '16px',
                 padding: '32px',
                 width: '100%',
@@ -409,7 +409,7 @@ export default function Alunos() {
             >
               {/* Header do Modal */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-                <h2 style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700', margin: 0 }}>
+                <h2 style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '700', margin: 0 }}>
                   Novo aluno
                 </h2>
                 <button
@@ -417,13 +417,13 @@ export default function Alunos() {
                   style={{
                     background: 'transparent',
                     border: 'none',
-                    color: '#6b7a99',
+                    color: 'var(--text-tertiary)',
                     fontSize: '20px',
                     cursor: 'pointer',
                     lineHeight: 1,
                     padding: '4px',
                   }}
-                  onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
+                  onMouseEnter={(e) => e.currentTarget.style.color = 'var(--text-primary)'}
                   onMouseLeave={(e) => e.currentTarget.style.color = '#6b7a99'}
                 >
                   ×
@@ -434,11 +434,11 @@ export default function Alunos() {
               {erroModal && (
                 <div style={{
                   background: 'rgba(255,107,107,0.08)',
-                  border: '1px solid #ff6b6b',
+                  border: '1px solid var(--error)',
                   borderRadius: '8px',
                   padding: '10px 14px',
                   marginBottom: '16px',
-                  color: '#ff6b6b',
+                  color: 'var(--error)',
                   fontSize: '13px',
                 }}>
                   {erroModal}
@@ -447,7 +447,7 @@ export default function Alunos() {
 
               {/* Campo Nome */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '600' }}>
                   Nome *
                 </label>
                 <input
@@ -457,9 +457,9 @@ export default function Alunos() {
                   onChange={(e) => setNovoNome(e.target.value)}
                   style={{
                     width: '100%',
-                    background: '#0d1424',
+                    background: 'var(--bg-surface)',
                     border: '1px solid #1a2540',
-                    color: '#ffffff',
+                    color: 'var(--text-primary)',
                     padding: '10px 12px',
                     borderRadius: '8px',
                     fontSize: '14px',
@@ -474,8 +474,8 @@ export default function Alunos() {
 
               {/* Campo Email */}
               <div style={{ marginBottom: '16px' }}>
-                <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
-                  Email <span style={{ fontWeight: '400', color: '#4a5568' }}>(opcional)</span>
+                <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '600' }}>
+                  Email <span style={{ fontWeight: '400', color: 'var(--text-tertiary)' }}>(opcional)</span>
                 </label>
                 <input
                   type="email"
@@ -484,9 +484,9 @@ export default function Alunos() {
                   onChange={(e) => setNovoEmail(e.target.value)}
                   style={{
                     width: '100%',
-                    background: '#0d1424',
+                    background: 'var(--bg-surface)',
                     border: '1px solid #1a2540',
-                    color: '#ffffff',
+                    color: 'var(--text-primary)',
                     padding: '10px 12px',
                     borderRadius: '8px',
                     fontSize: '14px',
@@ -501,7 +501,7 @@ export default function Alunos() {
 
               {/* Campo Turma */}
               <div style={{ marginBottom: '24px' }}>
-                <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+                <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-tertiary)', marginBottom: '6px', fontWeight: '600' }}>
                   Turma *
                 </label>
                 <select
@@ -509,9 +509,9 @@ export default function Alunos() {
                   onChange={(e) => setNovaTurmaId(e.target.value)}
                   style={{
                     width: '100%',
-                    background: '#0d1424',
+                    background: 'var(--bg-surface)',
                     border: '1px solid #1a2540',
-                    color: novaTurmaId ? '#ffffff' : '#6b7a99',
+                    color: novaTurmaId ? 'var(--text-primary)' : 'var(--text-tertiary)',
                     padding: '10px 12px',
                     borderRadius: '8px',
                     fontSize: '14px',
@@ -539,13 +539,13 @@ export default function Alunos() {
                     background: 'transparent',
                     border: '1px solid #1a2540',
                     borderRadius: '8px',
-                    color: '#6b7a99',
+                    color: 'var(--text-tertiary)',
                     fontSize: '14px',
                     fontWeight: '500',
                     cursor: 'pointer',
                     transition: 'all 0.2s',
                   }}
-                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#2a3a5a'; e.currentTarget.style.color = '#ffffff'; }}
+                  onMouseEnter={(e) => { e.currentTarget.style.borderColor = '#2a3a5a'; e.currentTarget.style.color = 'var(--text-primary)'; }}
                   onMouseLeave={(e) => { e.currentTarget.style.borderColor = '#1a2540'; e.currentTarget.style.color = '#6b7a99'; }}
                 >
                   Cancelar
@@ -559,7 +559,7 @@ export default function Alunos() {
                     background: salvando ? '#0f2252' : '#1a3a7c',
                     border: 'none',
                     borderRadius: '8px',
-                    color: '#ffffff',
+                    color: 'var(--text-primary)',
                     fontSize: '14px',
                     fontWeight: '600',
                     cursor: salvando ? 'not-allowed' : 'pointer',

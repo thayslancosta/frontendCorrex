@@ -50,15 +50,15 @@ export default function Turmas() {
             gap: '6px',
             background: 'transparent',
             border: 'none',
-            color: '#6b7a99',
+            color: 'var(--text-secondary)',
             fontSize: '13px',
             cursor: 'pointer',
             padding: '0',
             marginBottom: '20px',
             transition: 'color 0.2s',
           }}
-          onMouseEnter={(e) => e.currentTarget.style.color = '#ffffff'}
-          onMouseLeave={(e) => e.currentTarget.style.color = '#6b7a99'}
+          onMouseEnter={(e) => e.currentTarget.style.color = 'white'}
+          onMouseLeave={(e) => e.currentTarget.style.color = 'var(--text-secondary)'}
         >
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
             <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
@@ -69,19 +69,19 @@ export default function Turmas() {
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
           <div>
-            <h1 style={{ fontSize: '28px', fontWeight: '700', color: '#ffffff', margin: '0 0 8px 0' }}>
+            <h1 style={{ fontSize: '28px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 8px 0' }}>
               Turmas
             </h1>
-            <p style={{ fontSize: '14px', color: '#6b7a99', margin: '0' }}>
+            <p style={{ fontSize: '14px', color: 'var(--text-secondary)', margin: '0' }}>
               Gerencie suas turmas e alunos
             </p>
           </div>
           <button
             onClick={() => setShowForm((v) => !v)}
             style={{
-              background: '#1a3a7c',
+              background: 'var(--accent)',
               border: 'none',
-              color: '#ffffff',
+              color: 'var(--text-primary)',
               padding: '10px 20px',
               borderRadius: '8px',
               fontSize: '14px',
@@ -89,8 +89,8 @@ export default function Turmas() {
               cursor: 'pointer',
               transition: 'all 0.2s',
             }}
-            onMouseEnter={(e) => e.currentTarget.style.background = '#2547a3'}
-            onMouseLeave={(e) => e.currentTarget.style.background = '#1a3a7c'}
+            onMouseEnter={(e) => e.currentTarget.style.background = 'var(--accent-hover)'}
+            onMouseLeave={(e) => e.currentTarget.style.background = 'var(--accent)'}
           >
             {showForm ? 'Cancelar' : 'Nova turma'}
           </button>
@@ -98,8 +98,8 @@ export default function Turmas() {
 
         {showForm && (
           <div style={{
-            background: '#0a0f1a',
-            border: '1px solid #1a2540',
+            background: 'var(--bg-base)',
+            border: '1px solid var(--border)',
             borderRadius: '12px',
             padding: '20px',
             marginBottom: '24px',
@@ -108,7 +108,7 @@ export default function Turmas() {
             alignItems: 'flex-end',
           }}>
             <div style={{ flex: 1 }}>
-              <label style={{ display: 'block', fontSize: '12px', color: '#6b7a99', marginBottom: '6px', fontWeight: '600' }}>
+              <label style={{ display: 'block', fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '6px', fontWeight: '600' }}>
                 Nome da turma
               </label>
               <input
@@ -119,26 +119,26 @@ export default function Turmas() {
                 onKeyDown={(e) => e.key === 'Enter' && handleCriarTurma()}
                 style={{
                   width: '100%',
-                  background: '#0d1424',
-                  border: '1px solid #1a2540',
-                  color: '#ffffff',
+                  background: 'var(--bg-surface)',
+                  border: '1px solid var(--border)',
+                  color: 'var(--text-primary)',
                   padding: '10px 12px',
                   borderRadius: '8px',
                   fontSize: '14px',
                   outline: 'none',
                   boxSizing: 'border-box',
                 }}
-                onFocus={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
-                onBlur={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+                onFocus={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+                onBlur={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
               />
             </div>
             <button
               onClick={handleCriarTurma}
               disabled={criando || !nomaNova.trim()}
               style={{
-                background: criando ? '#0f2252' : '#1a3a7c',
+                background: criando ? '#0f2252' : 'var(--accent)',
                 border: 'none',
-                color: '#ffffff',
+                color: 'var(--text-primary)',
                 padding: '10px 20px',
                 borderRadius: '8px',
                 fontSize: '14px',
@@ -153,8 +153,8 @@ export default function Turmas() {
           </div>
         )}
 
-        {loading && <p style={{ color: '#6b7a99', textAlign: 'center', padding: '40px' }}>Carregando turmas...</p>}
-        {erro && <p style={{ color: '#ef4444', textAlign: 'center', padding: '40px' }}>{erro}</p>}
+        {loading && <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px' }}>Carregando turmas...</p>}
+        {erro && <p style={{ color: 'var(--error)', textAlign: 'center', padding: '40px' }}>{erro}</p>}
         <div
           style={{
             display: 'grid',
@@ -166,28 +166,28 @@ export default function Turmas() {
             <div
               key={turma.id}
               style={{
-                background: '#0a0f1a',
-                border: '1px solid #1a2540',
+                background: 'var(--bg-base)',
+                border: '1px solid var(--border)',
                 borderRadius: '12px',
                 padding: '20px',
                 transition: 'all 0.2s',
                 cursor: 'pointer',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
-              onMouseLeave={(e) => e.currentTarget.style.borderColor = '#1a2540'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
+              onMouseLeave={(e) => e.currentTarget.style.borderColor = 'var(--border)'}
             >
               {/* Header do Card */}
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '16px' }}>
                 <div>
-                  <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#ffffff', margin: '0 0 4px 0' }}>
+                  <h3 style={{ fontSize: '16px', fontWeight: '700', color: 'var(--text-primary)', margin: '0 0 4px 0' }}>
                     {turma.nome}
                   </h3>
                 </div>
                 <span
                   style={{
                     background: turma.ativa ? 'rgba(52, 211, 153, 0.12)' : 'rgba(107, 122, 153, 0.12)',
-                    color: turma.ativa ? '#34d399' : '#6b7a99',
-                    border: `1px solid ${turma.ativa ? '#34d399' : '#6b7a99'}`,
+                    color: turma.ativa ? 'var(--success)' : 'var(--text-secondary)',
+                    border: `1px solid ${turma.ativa ? 'var(--success)' : 'var(--text-secondary)'}`,
                     padding: '4px 12px',
                     borderRadius: '6px',
                     fontSize: '12px',
@@ -201,20 +201,20 @@ export default function Turmas() {
               {/* Stats */}
               <div style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
                 <div>
-                  <p style={{ fontSize: '12px', color: '#6b7a99', margin: '0 0 4px 0' }}>Alunos</p>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 4px 0' }}>Alunos</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: '#4a7cff' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--text-link)' }}>
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                    <p style={{ fontSize: '18px', fontWeight: '700', color: '#ffffff', margin: '0' }}>
+                    <p style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', margin: '0' }}>
                       {turma.totalAlunos}
                     </p>
                   </div>
                 </div>
                 <div>
-                  <p style={{ fontSize: '12px', color: '#6b7a99', margin: '0 0 4px 0' }}>Média geral</p>
-                  <p style={{ fontSize: '18px', fontWeight: '700', color: '#ffffff', margin: '0' }}>
+                  <p style={{ fontSize: '12px', color: 'var(--text-secondary)', margin: '0 0 4px 0' }}>Média geral</p>
+                  <p style={{ fontSize: '18px', fontWeight: '700', color: 'var(--text-primary)', margin: '0' }}>
                     {turma.mediaGeral != null ? Number(turma.mediaGeral).toFixed(1) : '—'}
                   </p>
                 </div>
@@ -226,8 +226,8 @@ export default function Turmas() {
                 style={{
                   width: '100%',
                   background: 'transparent',
-                  border: '1px solid #1a3a7c',
-                  color: '#4a7cff',
+                  border: '1px solid var(--accent)',
+                  color: 'var(--text-link)',
                   padding: '10px',
                   borderRadius: '8px',
                   fontSize: '13px',

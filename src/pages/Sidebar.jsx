@@ -79,7 +79,7 @@ export default function Sidebar() {
               <path d="M3 12L6 4l3 6 2-3 2 5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
-          <span style={{ color: '#ffffff', fontSize: '17px', fontWeight: '600', letterSpacing: '-0.3px' }}>
+          <span style={{ color: 'var(--text-primary)', fontSize: '17px', fontWeight: '600', letterSpacing: '-0.3px' }}>
             CorreX
           </span>
         </div>
@@ -149,14 +149,14 @@ export default function Sidebar() {
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: '12px',
-            color: '#fff',
+            color: 'var(--text-primary)',
             fontWeight: '600',
             flexShrink: 0,
           }}>
             P
           </div>
           <div>
-            <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>Professor</div>
+            <div style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500' }}>Professor</div>
             <div style={{ color: MUTED, fontSize: '11px' }}>Admin</div>
           </div>
         </div>

@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { login } from '../services/authService';
 
-const ROYAL = '#1a3a7c';
-const ROYAL_DARK = '#122b5e';
+const ROYAL = 'var(--accent)';
+const ROYAL_DARK = 'var(--accent-dark)';
 const BG_DARK = '#070c18';
-const BG_INPUT = '#0d1424';
-const BORDER = '#1a2540';
-const MUTED = '#6b7a99';
+const BG_INPUT = 'var(--bg-surface)';
+const BORDER = 'var(--border)';
+const MUTED = 'var(--text-secondary)';
 
 export default function Login() {
   const navigate = useNavigate();
@@ -52,15 +52,15 @@ export default function Login() {
               flexShrink: 0,
             }}>
               <svg width="18" height="18" viewBox="0 0 16 16" fill="none">
-                <path d="M3 12L6 4l3 6 2-3 2 5" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M3 12L6 4l3 6 2-3 2 5" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
-            <span style={{ color: '#ffffff', fontWeight: '600', letterSpacing: '-0.3px' }}>
+            <span style={{ color: 'var(--text-primary)', fontWeight: '600', letterSpacing: '-0.3px' }}>
               CorreX
             </span>
           </div>
 
-          <h1 className="login-heading" style={{ color: '#ffffff' }}>
+          <h1 className="login-heading" style={{ color: 'var(--text-primary)' }}>
             Bem-vindo de volta
           </h1>
           <p className="login-subheading" style={{ color: MUTED }}>
@@ -79,7 +79,7 @@ export default function Login() {
                 style={{
                   background: BG_INPUT,
                   border: `1px solid ${BORDER}`,
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                 }}
                 onFocus={(e) => e.target.style.borderColor = ROYAL}
                 onBlur={(e) => e.target.style.borderColor = BORDER}
@@ -97,7 +97,7 @@ export default function Login() {
                 style={{
                   background: BG_INPUT,
                   border: `1px solid ${BORDER}`,
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                 }}
                 onFocus={(e) => e.target.style.borderColor = ROYAL}
                 onBlur={(e) => e.target.style.borderColor = BORDER}
@@ -109,7 +109,7 @@ export default function Login() {
                 <input type="checkbox" style={{ accentColor: ROYAL }} />
                 Lembrar de mim
               </label>
-              <a href="#" style={{ color: '#4a7cff', fontSize: '13px', textDecoration: 'none' }}>
+              <a href="#" style={{ color: 'var(--text-link)', fontSize: '13px', textDecoration: 'none' }}>
                 Esqueceu a senha?
               </a>
             </div>
@@ -117,11 +117,11 @@ export default function Login() {
             {erro && (
               <div style={{
                 background: 'rgba(255, 107, 107, 0.08)',
-                border: '1px solid #ff6b6b',
+                border: '1px solid var(--error)',
                 borderRadius: '8px',
                 padding: '10px 14px',
                 marginBottom: '16px',
-                color: '#ff6b6b',
+                color: 'var(--error)',
                 fontSize: '13px',
                 fontWeight: '500',
               }}>
@@ -135,7 +135,7 @@ export default function Login() {
               disabled={loading}
               style={{
                 background: loading ? '#0f2252' : ROYAL,
-                color: '#ffffff',
+                color: 'var(--text-primary)',
                 cursor: loading ? 'not-allowed' : 'pointer',
                 opacity: loading ? 0.7 : 1,
               }}
@@ -167,11 +167,11 @@ export default function Login() {
               marginBottom: '28px',
             }}>
               <svg width="26" height="26" viewBox="0 0 24 24" fill="none">
-                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M12 20h9M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4 12.5-12.5z" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </div>
 
-            <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: '600', marginBottom: '12px', lineHeight: 1.3 }}>
+            <h2 style={{ color: 'var(--text-primary)', fontSize: '20px', fontWeight: '600', marginBottom: '12px', lineHeight: 1.3 }}>
               Corrija redações com IA
             </h2>
             <p style={{ color: '#8faad4', fontSize: '14px', lineHeight: '1.7', marginBottom: '40px' }}>
@@ -186,7 +186,7 @@ export default function Login() {
                 { num: '98%', label: 'Precisão' },
               ].map((item) => (
                 <div key={item.label}>
-                  <div style={{ color: '#ffffff', fontSize: '18px', fontWeight: '700' }}>{item.num}</div>
+                  <div style={{ color: 'var(--text-primary)', fontSize: '18px', fontWeight: '700' }}>{item.num}</div>
                   <div style={{ color: '#8faad4', fontSize: '11px', marginTop: '2px' }}>{item.label}</div>
                 </div>
               ))}
@@ -213,7 +213,7 @@ export default function Login() {
                   flexShrink: 0,
                 }}>
                   <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                    <path d="M2 5l2 2 4-4" stroke="#ffffff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    <path d="M2 5l2 2 4-4" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
                   </svg>
                 </div>
                 <span style={{ color: '#c8d8f0', fontSize: '13px' }}>{feat}</span>

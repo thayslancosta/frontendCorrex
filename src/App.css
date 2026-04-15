@@ -1,53 +1,29 @@
-/* === ROOT COLORS === */
-:root {
-  --color-royal: #1a3a7c;
-  --color-border: #1a2540;
-  --color-muted: #6b7a99;
-  --color-bg-card: #0a0f1a;
-  --color-bg-row: #0d1424;
-  --color-text-primary: #ffffff;
-  --color-text-secondary: #cbd5e1;
-  --color-accent: #4a7cff;
-  --color-success: #22c55e;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
+/* Utilitários mínimos — estilos principais estão em mobile-first.css */
+.text-muted    { color: var(--text-secondary); }
+.text-primary  { color: var(--text-primary); }
+.text-accent   { color: var(--accent); }
+
+.mb-s  { margin-bottom: 8px; }
+.mb-m  { margin-bottom: 16px; }
+.mb-l  { margin-bottom: 24px; }
+.mb-xl { margin-bottom: 32px; }
+
+code {
+  font-family: 'Monaco', 'Courier New', monospace;
+  font-size: 12px;
+  padding: 2px 6px;
+  background: var(--bg-active);
+  border-radius: 4px;
+  color: var(--text-link);
 }
 
-/* === UTILITIES === */
-.text-muted {
-  color: var(--color-muted);
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
 }
-
-.text-primary {
-  color: var(--color-text-primary);
-}
-
-.text-accent {
-  color: var(--color-accent);
-}
-
-.mt-0 {
-  margin-top: 0;
-}
-
-.mb-s {
-  margin-bottom: 8px;
-}
-
-.mb-m {
-  margin-bottom: 16px;
-}
-
-.mb-l {
-  margin-bottom: 24px;
-}
-
-.mb-xl {
-  margin-bottom: 32px;
-}
-
-.gap-s {
-  gap: 8px;
 }
 
 .gap-m {

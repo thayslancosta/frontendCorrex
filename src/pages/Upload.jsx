@@ -6,17 +6,17 @@ import { getAlunos } from '../services/alunoService';
 import { enviarRedacaoTexto, enviarRedacaoArquivo } from '../services/redacaoService';
 import api from '../services/api';
 
-const ROYAL = '#1a3a7c';
-const BORDER = '#1a2540';
-const MUTED = '#6b7a99';
-const BG_CARD = '#0a0f1a';
-const BG_INPUT = '#0d1424';
+const ROYAL = 'var(--accent)';
+const BORDER = 'var(--border)';
+const MUTED = 'var(--text-secondary)';
+const BG_CARD = 'var(--bg-base)';
+const BG_INPUT = 'var(--bg-surface)';
 
 const IconFile = () => (
   <svg width="36" height="36" viewBox="0 0 36 36" fill="none">
-    <path d="M9 4h12l8 8v20a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="#4a7cff" strokeWidth="1.5" strokeLinejoin="round" />
-    <path d="M21 4v8h8" stroke="#4a7cff" strokeWidth="1.5" strokeLinejoin="round" />
-    <path d="M18 20v-7M15 16l3-3 3 3" stroke="#4a7cff" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+    <path d="M9 4h12l8 8v20a2 2 0 01-2 2H9a2 2 0 01-2-2V6a2 2 0 012-2z" stroke="var(--text-link)" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M21 4v8h8" stroke="var(--text-link)" strokeWidth="1.5" strokeLinejoin="round" />
+    <path d="M18 20v-7M15 16l3-3 3 3" stroke="var(--text-link)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
   </svg>
 );
 
@@ -125,7 +125,7 @@ export default function Upload() {
     background: BG_INPUT,
     border: `1px solid ${BORDER}`,
     borderRadius: '8px',
-    color: '#ffffff',
+    color: 'var(--text-primary)',
     fontSize: '14px',
     cursor: 'pointer',
     outline: 'none',
@@ -138,7 +138,7 @@ export default function Upload() {
       <div className="page-content">
         {/* Header */}
         <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ color: '#ffffff', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
+          <h1 style={{ color: 'var(--text-primary)', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
             Nova correção
           </h1>
           <p style={{ color: MUTED, fontSize: '14px' }}>
@@ -149,7 +149,7 @@ export default function Upload() {
         {/* Selects */}
         <div className="form-grid" style={{ marginBottom: '24px' }}>
           <div>
-            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+            <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '7px' }}>
               Turma
             </label>
             <select value={turma} onChange={(e) => setTurma(e.target.value)} style={selectStyle}>
@@ -161,7 +161,7 @@ export default function Upload() {
           </div>
 
           <div>
-            <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px' }}>
+            <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '7px' }}>
               Idioma da redação
             </label>
             <select value={idioma} onChange={(e) => setIdioma(e.target.value)} style={selectStyle}>
@@ -175,7 +175,7 @@ export default function Upload() {
 
         {/* Seleção de Aluno */}
         <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
+          <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
             Aluno
           </label>
 
@@ -196,7 +196,7 @@ export default function Upload() {
               style={{
                 background: 'transparent',
                 border: `1px solid ${BORDER}`,
-                color: '#4a7cff',
+                color: 'var(--text-link)',
                 padding: '11px 16px',
                 borderRadius: '8px',
                 fontSize: '13px',
@@ -205,7 +205,7 @@ export default function Upload() {
                 whiteSpace: 'nowrap',
                 transition: 'all 0.2s',
               }}
-              onMouseEnter={(e) => e.currentTarget.style.borderColor = '#1a3a7c'}
+              onMouseEnter={(e) => e.currentTarget.style.borderColor = 'var(--accent)'}
               onMouseLeave={(e) => e.currentTarget.style.borderColor = BORDER}
             >
               {showNovoAluno ? 'Cancelar' : '+ Novo aluno'}
@@ -216,23 +216,23 @@ export default function Upload() {
           {showNovoAluno && (
             <div style={{
               marginTop: '12px',
-              background: '#0a0f1a',
+              background: 'var(--bg-base)',
               border: `1px solid ${BORDER}`,
               borderRadius: '12px',
               padding: '20px',
             }}>
-              <p style={{ color: '#9aaac4', fontSize: '13px', fontWeight: '600', margin: '0 0 16px 0' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '13px', fontWeight: '600', margin: '0 0 16px 0' }}>
                 Criar novo aluno
               </p>
 
               {erroAluno && (
                 <div style={{
                   background: 'rgba(255,107,107,0.08)',
-                  border: '1px solid #ff6b6b',
+                  border: '1px solid var(--error)',
                   borderRadius: '8px',
                   padding: '8px 12px',
                   marginBottom: '12px',
-                  color: '#ff6b6b',
+                  color: 'var(--error)',
                   fontSize: '13px',
                 }}>
                   {erroAluno}
@@ -241,7 +241,7 @@ export default function Upload() {
 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '12px' }}>
                 <div>
-                  <label style={{ display: 'block', color: '#9aaac4', fontSize: '12px', marginBottom: '5px' }}>Nome *</label>
+                  <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '5px' }}>Nome *</label>
                   <input
                     type="text"
                     placeholder="Ex: Maria Silva"
@@ -253,7 +253,7 @@ export default function Upload() {
                       background: BG_INPUT,
                       border: `1px solid ${BORDER}`,
                       borderRadius: '8px',
-                      color: '#ffffff',
+                      color: 'var(--text-primary)',
                       fontSize: '13px',
                       outline: 'none',
                       boxSizing: 'border-box',
@@ -264,7 +264,7 @@ export default function Upload() {
                 </div>
 
                 <div>
-                  <label style={{ display: 'block', color: '#9aaac4', fontSize: '12px', marginBottom: '5px' }}>Email (opcional)</label>
+                  <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '5px' }}>Email (opcional)</label>
                   <input
                     type="email"
                     placeholder="Ex: maria@email.com"
@@ -276,7 +276,7 @@ export default function Upload() {
                       background: BG_INPUT,
                       border: `1px solid ${BORDER}`,
                       borderRadius: '8px',
-                      color: '#ffffff',
+                      color: 'var(--text-primary)',
                       fontSize: '13px',
                       outline: 'none',
                       boxSizing: 'border-box',
@@ -289,7 +289,7 @@ export default function Upload() {
 
               <div style={{ display: 'flex', gap: '12px', alignItems: 'flex-end' }}>
                 <div style={{ flex: 1 }}>
-                  <label style={{ display: 'block', color: '#9aaac4', fontSize: '12px', marginBottom: '5px' }}>Turma *</label>
+                  <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '12px', marginBottom: '5px' }}>Turma *</label>
                   <select
                     value={novoAlunoTurmaId}
                     onChange={(e) => setNovoAlunoTurmaId(e.target.value)}
@@ -308,7 +308,7 @@ export default function Upload() {
                   style={{
                     background: criandoAluno ? '#0f2252' : ROYAL,
                     border: 'none',
-                    color: '#ffffff',
+                    color: 'var(--text-primary)',
                     padding: '10px 20px',
                     borderRadius: '8px',
                     fontSize: '13px',
@@ -418,7 +418,7 @@ export default function Upload() {
           }}>
             <IconFile />
             <div style={{ textAlign: 'center' }}>
-              <div style={{ color: '#ffffff', fontSize: '15px', fontWeight: '500', marginBottom: '4px' }}>
+              <div style={{ color: 'var(--text-primary)', fontSize: '15px', fontWeight: '500', marginBottom: '4px' }}>
                 Arraste arquivos aqui ou clique para selecionar
               </div>
               <div style={{ color: MUTED, fontSize: '13px' }}>
@@ -430,7 +430,7 @@ export default function Upload() {
 
         {files.length > 0 && (
           <div style={{ marginBottom: '24px' }}>
-            <h3 style={{ color: '#9aaac4', fontSize: '13px', fontWeight: '500', marginBottom: '10px' }}>
+            <h3 style={{ color: 'var(--text-secondary)', fontSize: '13px', fontWeight: '500', marginBottom: '10px' }}>
               {files.length} arquivo{files.length > 1 ? 's' : ''} adicionado{files.length > 1 ? 's' : ''}
             </h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -449,7 +449,7 @@ export default function Upload() {
                       <IconFileSmall />
                     </div>
                     <div>
-                      <div style={{ color: '#ffffff', fontSize: '13px', fontWeight: '500' }}>{file.name}</div>
+                      <div style={{ color: 'var(--text-primary)', fontSize: '13px', fontWeight: '500' }}>{file.name}</div>
                       <div style={{ color: MUTED, fontSize: '11px', marginTop: '2px' }}>{file.size}</div>
                     </div>
                   </div>
@@ -483,7 +483,7 @@ export default function Upload() {
           <>
             {/* Campo Redação */}
             <div style={{ marginBottom: '12px' }}>
-              <label style={{ display: 'block', color: '#9aaac4', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
+              <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '13px', marginBottom: '7px', fontWeight: '600' }}>
                 Redação
               </label>
               <textarea
@@ -497,7 +497,7 @@ export default function Upload() {
                   background: BG_INPUT,
                   border: `1px solid ${BORDER}`,
                   borderRadius: '8px',
-                  color: '#ffffff',
+                  color: 'var(--text-primary)',
                   fontSize: '14px',
                   lineHeight: 1.9,
                   fontFamily: 'inherit',
