@@ -16,13 +16,18 @@ export async function enviarRedacaoTexto(payload) {
 }
 
 export async function enviarRedacaoArquivo(formData) {
-  const { data } = await api.post('/redacoes/arquivo', formData, {
+  const { data } = await api.post('/redacoes/upload', formData, {
     headers: { 'Content-Type': 'multipart/form-data' },
   });
   return data;
 }
 
 export async function revisarRedacao(id, payload) {
-  const { data } = await api.post(`/redacoes/${id}/revisao`, payload);
+  const { data } = await api.put(`/redacoes/${id}/revisao`, payload);
+  return data;
+}
+
+export async function recorrigirRedacao(id, payload) {
+  const { data } = await api.put(`/redacoes/${id}/recorrigir`, payload);
   return data;
 }

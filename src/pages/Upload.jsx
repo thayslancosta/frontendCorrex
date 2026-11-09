@@ -5,6 +5,8 @@ import { getTurmas } from '../services/turmaService';
 import { getAlunos } from '../services/alunoService';
 import { enviarRedacaoTexto, enviarRedacaoArquivo } from '../services/redacaoService';
 import api from '../services/api';
+import { PageTransition } from '../components/PageTransition';
+import { useToast } from '../components/Toast';
 
 const ROYAL = 'var(--accent)';
 const BORDER = 'var(--border)';
@@ -35,6 +37,7 @@ const IconRemove = () => (
 
 export default function Upload() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [modoEntrada, setModoEntrada] = useState('arquivo');
   const [turma, setTurma] = useState('');
   const [idioma, setIdioma] = useState('');
@@ -136,15 +139,16 @@ export default function Upload() {
       <Sidebar />
 
       <div className="page-content">
-        {/* Header */}
-        <div style={{ marginBottom: '32px' }}>
-          <h1 style={{ color: 'var(--text-primary)', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
-            Nova correção
-          </h1>
-          <p style={{ color: MUTED, fontSize: '14px' }}>
-            Envie redações para correção automática com IA
-          </p>
-        </div>
+        <PageTransition>
+          {/* Header */}
+          <div style={{ marginBottom: '32px' }}>
+            <h1 style={{ color: 'var(--text-primary)', fontSize: '22px', fontWeight: '600', marginBottom: '4px' }}>
+              Nova correção
+            </h1>
+            <p style={{ color: MUTED, fontSize: '14px' }}>
+              Envie redações para correção automática com IA
+            </p>
+          </div>
 
         {/* Selects */}
         <div className="form-grid" style={{ marginBottom: '24px' }}>
@@ -521,8 +525,8 @@ export default function Upload() {
         {/* Botão */}
         <button
           onClick={async () => {
-            if (!turma || !idioma) { alert('Selecione turma e idioma.'); return; }
-            if (!alunoId) { alert('Selecione um aluno.'); return; }
+            if (!turma || !idioma) { addToast('Selecione turma e idioma.', 'error'); return; }
+            if (!alunoId) { addToast('Selecione um aluno.', 'error'); return; }
             setEnviando(true);
             try {
               let data;
@@ -543,7 +547,7 @@ export default function Upload() {
               }
               navigate('/correcao', { state: { redacaoId: data.id } });
             } catch {
-              alert('Erro ao enviar redação. Tente novamente.');
+              addToast('Erro ao enviar redação. Tente novamente.', 'error');
             } finally {
               setEnviando(false);
             }
@@ -578,6 +582,7 @@ export default function Upload() {
         >
           {enviando ? 'Enviando...' : 'Enviar para correção'}
         </button>
+        </PageTransition>
       </div>
     </div>
   );

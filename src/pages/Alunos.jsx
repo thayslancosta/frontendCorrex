@@ -4,6 +4,8 @@ import Sidebar from '../components/Sidebar';
 import { getAlunos } from '../services/alunoService';
 import api from '../services/api';
 import { getTurmas } from '../services/turmaService';
+import { SkeletonTable } from '../components/Skeleton';
+import { PageTransition } from '../components/PageTransition';
 
 export default function Alunos() {
   const navigate = useNavigate();
@@ -216,31 +218,8 @@ const formatarData = (iso) => {
         </div>
 
         {loading && (
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            minHeight: '60vh',
-            color: 'var(--text-secondary)',
-          }}>
-            <div style={{ textAlign: 'center' }}>
-              <div style={{
-                width: '40px',
-                height: '40px',
-                border: '3px solid var(--border)',
-                borderTop: '3px solid var(--text-link)',
-                borderRadius: '50%',
-                animation: 'spin 1s linear infinite',
-                margin: '0 auto 16px',
-              }}></div>
-              <p style={{ margin: 0 }}>Carregando alunos...</p>
-              <style>{`
-                @keyframes spin {
-                  0% { transform: rotate(0deg); }
-                  100% { transform: rotate(360deg); }
-                }
-              `}</style>
-            </div>
+          <div style={{ border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+            <SkeletonTable rows={6} cols={5} />
           </div>
         )}
 
@@ -282,7 +261,7 @@ const formatarData = (iso) => {
         )}
 
         {!loading && !erro && (
-          <>
+          <PageTransition>
             {/* Tabela de Alunos */}
             <div style={{ overflowX: 'auto' }}>
               <table
@@ -380,7 +359,7 @@ const formatarData = (iso) => {
                 Nenhum aluno encontrado.
               </div>
             )}
-          </>
+          </PageTransition>
         )}
         {/* Modal Novo Aluno */}
         {showModal && (

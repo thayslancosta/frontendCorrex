@@ -2,9 +2,12 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getCriterios, createCriterio, updateCriterio, deleteCriterio } from '../services/criterioService';
+import { PageTransition } from '../components/PageTransition';
+import { useToast } from '../components/Toast';
 
 export default function Criterios() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [criterios, setCriterios] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
@@ -27,12 +30,12 @@ export default function Criterios() {
       const novo = await createCriterio({ nome: novoNome, descricao: novaDescricao, peso: parseInt(novoPeso) });
       setCriterios((prev) => [...prev, novo]);
       setNovoNome(''); setNovaDescricao(''); setNovoPeso('');
-    } catch { alert('Erro ao adicionar critério.'); }
+    } catch { addToast('Erro ao adicionar critério.', 'error'); }
   };
 
   const handleRemoverCriterio = async (id) => {
     try { await deleteCriterio(id); setCriterios((prev) => prev.filter((c) => c.id !== id)); }
-    catch { alert('Erro ao remover critério.'); }
+    catch { addToast('Erro ao remover critério.', 'error'); }
   };
 
   const handleAtualizarPeso = async (id, peso) => {
@@ -41,7 +44,7 @@ export default function Criterios() {
     try {
       const atualizado = await updateCriterio(id, { ...criterio, peso });
       setCriterios((prev) => prev.map((c) => (c.id === id ? atualizado : c)));
-    } catch { alert('Erro ao atualizar peso.'); }
+    } catch { addToast('Erro ao atualizar peso.', 'error'); }
   };
 
   const handleToggleAtivo = async (id) => {
@@ -50,7 +53,7 @@ export default function Criterios() {
     try {
       const atualizado = await updateCriterio(id, { ...criterio, ativo: !criterio.ativo });
       setCriterios((prev) => prev.map((c) => (c.id === id ? atualizado : c)));
-    } catch { alert('Erro ao atualizar critério.'); }
+    } catch { addToast('Erro ao atualizar critério.', 'error'); }
   };
 
   const indicadorColor = totalPeso === 100 ? 'var(--success)' : 'var(--warning)';
@@ -67,7 +70,8 @@ export default function Criterios() {
           Voltar
         </button>
 
-        {loading && <p style={{ color: 'var(--text-secondary)', padding: '40px', textAlign: 'center' }}>Carregando critérios...</p>}
+        <PageTransition>
+          {loading && <p style={{ color: 'var(--text-secondary)', padding: '40px', textAlign: 'center' }}>Carregando critérios...</p>}
         {erro    && <p style={{ color: 'var(--error)', padding: '40px', textAlign: 'center' }}>{erro}</p>}
 
         <div style={{ marginBottom: '28px' }}>
@@ -139,6 +143,7 @@ export default function Criterios() {
             </button>
           </div>
         </div>
+        </PageTransition>
       </div>
     </div>
   );

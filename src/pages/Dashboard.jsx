@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import Sidebar from '../components/Sidebar';
 import { getDashboard } from '../services/dashboardService';
 import { getUser } from '../services/authService';
+import { Skeleton, SkeletonCard, SkeletonTable } from '../components/Skeleton';
+import { PageTransition } from '../components/PageTransition';
 
 export default function Dashboard() {
   const user = getUser();
@@ -42,10 +44,23 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {loading && <p style={{ color: 'var(--text-secondary)', padding: '40px 0' }}>Carregando...</p>}
+        {loading && (
+          <>
+            <div className="stats-grid" style={{ marginBottom: '24px' }}>
+              {[1,2,3,4].map(i => <SkeletonCard key={i} />)}
+            </div>
+            <div style={{ border: '1px solid var(--border)', borderRadius: '8px', overflow: 'hidden' }}>
+              <div style={{ padding: '14px 18px', borderBottom: '1px solid var(--border)' }}>
+                <Skeleton height="14px" width="180px" />
+              </div>
+              <SkeletonTable rows={5} cols={5} />
+            </div>
+          </>
+        )}
         {erro    && <p style={{ color: 'var(--error)', padding: '40px 0' }}>{erro}</p>}
 
         {dados && (
+          <PageTransition>
           <>
             <div className="stats-grid">
               {stats.map(({ label, value }) => (
@@ -93,6 +108,7 @@ export default function Dashboard() {
               </div>
             </div>
           </>
+          </PageTransition>
         )}
       </div>
     </div>
