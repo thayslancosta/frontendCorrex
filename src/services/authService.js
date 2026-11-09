@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8080/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8080/api/v1';
 
 const authService = {
   async login(email, senha) {
@@ -12,9 +12,10 @@ const authService = {
 
       if (response.data.token) {
         localStorage.setItem('token', response.data.token);
-        if (response.data.user) {
-          localStorage.setItem('user', JSON.stringify(response.data.user));
-        }
+        localStorage.setItem('user', JSON.stringify({
+          nome: response.data.nome,
+          email: response.data.email,
+        }));
       }
 
       return response.data;

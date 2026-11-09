@@ -2,9 +2,13 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getTurmas, createTurma } from '../services/turmaService';
+import { Skeleton } from '../components/Skeleton';
+import { PageTransition } from '../components/PageTransition';
+import { useToast } from '../components/Toast';
 
 export default function Turmas() {
   const navigate = useNavigate();
+  const { addToast } = useToast();
   const [turmas, setTurmas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
@@ -31,7 +35,7 @@ export default function Turmas() {
       setNomaNova('');
       setShowForm(false);
     } catch {
-      alert('Erro ao criar turma. Tente novamente.');
+      addToast('Erro ao criar turma. Tente novamente.', 'error');
     } finally {
       setCriando(false);
     }
@@ -153,15 +157,26 @@ export default function Turmas() {
           </div>
         )}
 
-        {loading && <p style={{ color: 'var(--text-secondary)', textAlign: 'center', padding: '40px' }}>Carregando turmas...</p>}
-        {erro && <p style={{ color: 'var(--error)', textAlign: 'center', padding: '40px' }}>{erro}</p>}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
-            gap: '20px',
-          }}
-        >
+        <PageTransition>
+          {loading && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
+              {[1,2,3,4].map(i => (
+                <div key={i} style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '20px' }}>
+                  <Skeleton height="16px" width="60%" style={{ marginBottom: '12px' }} />
+                  <Skeleton height="12px" width="40%" style={{ marginBottom: '20px' }} />
+                  <Skeleton height="36px" width="100%" />
+                </div>
+              ))}
+            </div>
+          )}
+          {erro && <p style={{ color: 'var(--error)', textAlign: 'center', padding: '40px' }}>{erro}</p>}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
+              gap: '20px',
+            }}
+          >
           {turmas.map((turma) => (
             <div
               key={turma.id}
@@ -247,6 +262,7 @@ export default function Turmas() {
             </div>
           ))}
         </div>
+        </PageTransition>
       </div>
     </div>
   );

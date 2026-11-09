@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import { getRedacao, revisarRedacao } from '../services/redacaoService';
+import { PageTransition } from '../components/PageTransition';
+import { useToast } from '../components/Toast';
 
 const badgeConfig = {
   Grammar:    { bg: 'var(--info-muted)',    color: 'var(--info)',    border: 'var(--info)'    },
@@ -13,11 +15,14 @@ const badgeConfig = {
 export default function Revisao() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { addToast } = useToast();
   const redacaoId = location.state?.redacaoId;
+  const draft = location.state?.draft;
 
   const [redacao, setRedacao] = useState(null);
   const [nota, setNota] = useState('');
   const [feedback, setFeedback] = useState('');
+  const [textoEditado, setTextoEditado] = useState('');
   const [loading, setLoading] = useState(true);
   const [enviando, setEnviando] = useState(false);
   const [erro, setErro] = useState('');
@@ -28,21 +33,27 @@ export default function Revisao() {
       try {
         const data = await getRedacao(redacaoId);
         setRedacao(data);
-        setNota(data.nota || '');
+        setNota(draft?.notaFinalManual ?? data.correcao?.notaFinalManual ?? data.correcao?.notaFinal ?? '');
+        setFeedback(draft?.feedbackExtra ?? data.correcao?.feedbackExtra ?? '');
+        setTextoEditado(draft?.textoEditado ?? data.textoEditado ?? data.textoOriginal ?? '');
       } catch { setErro('Erro ao carregar redação'); }
       finally { setLoading(false); }
     };
     carregar();
-  }, [redacaoId]);
+  }, [draft, redacaoId]);
 
   const handleSubmit = async () => {
-    if (!nota || nota < 0 || nota > 10) { alert('Nota deve estar entre 0 e 10'); return; }
+    if (!nota || nota < 0 || nota > 100) { addToast('Nota deve estar entre 0 e 100', 'error'); return; }
     setEnviando(true);
     try {
-      await revisarRedacao(redacaoId, { nota: parseFloat(nota), feedback: feedback.trim() });
-      alert('Revisão enviada com sucesso!');
+      await revisarRedacao(redacaoId, {
+        textoEditado: textoEditado.trim() || null,
+        notaFinalManual: parseFloat(nota),
+        feedbackExtra: feedback.trim(),
+      });
+      addToast('Revisão enviada com sucesso!', 'success');
       navigate('/dashboard');
-    } catch { alert('Erro ao enviar revisão. Tente novamente.'); }
+    } catch { addToast('Erro ao enviar revisão. Tente novamente.', 'error'); }
     finally { setEnviando(false); }
   };
 
@@ -59,12 +70,13 @@ export default function Revisao() {
           Voltar
         </button>
 
-        <div style={{ marginBottom: '28px' }}>
-          <h1>Revisão</h1>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px' }}>Revise e finalize antes de enviar ao aluno</p>
-        </div>
+        <PageTransition>
+          <div style={{ marginBottom: '28px' }}>
+            <h1>Revisão</h1>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '13px', marginTop: '4px' }}>Revise e finalize antes de enviar ao aluno</p>
+          </div>
 
-        {loading && <p style={{ color: 'var(--text-secondary)', padding: '40px 0' }}>Carregando redação...</p>}
+          {loading && <p style={{ color: 'var(--text-secondary)', padding: '40px 0' }}>Carregando redação...</p>}
         {erro    && <p style={{ color: 'var(--error)', padding: '40px 0' }}>{erro}</p>}
 
         {redacao && (
@@ -72,9 +84,9 @@ export default function Revisao() {
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: '8px', padding: '28px', marginBottom: '16px' }}>
               <div className="review-info" style={{ marginBottom: '24px' }}>
                 {[
-                  { label: 'Aluno', value: redacao.alunoNome || 'N/A' },
-                  { label: 'Turma', value: redacao.nomeTurma || 'N/A' },
-                  { label: 'Data',  value: redacao.dataCriacao ? new Date(redacao.dataCriacao).toLocaleDateString('pt-BR') : 'N/A' },
+                  { label: 'Aluno', value: redacao.nomeAluno || 'N/A' },
+                  { label: 'Turma', value: redacao.turma || 'N/A' },
+                  { label: 'Data',  value: redacao.createdAt ? new Date(redacao.createdAt).toLocaleDateString('pt-BR') : 'N/A' },
                 ].map(({ label, value }) => (
                   <div key={label}>
                     <div style={{ color: 'var(--text-tertiary)', fontSize: '11px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '5px' }}>{label}</div>
@@ -85,9 +97,21 @@ export default function Revisao() {
 
               <div style={{ borderBottom: '1px solid var(--border)', marginBottom: '24px' }} />
 
+              <div style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '500', marginBottom: '6px' }}>Texto revisado</label>
+                <textarea
+                  value={textoEditado}
+                  onChange={(e) => setTextoEditado(e.target.value)}
+                  disabled={enviando}
+                  style={{ ...inp, width: '100%', minHeight: '180px', padding: '10px 12px', fontFamily: 'inherit', resize: 'vertical', opacity: enviando ? 0.5 : 1 }}
+                  onFocus={(e) => e.target.style.borderColor = 'var(--accent)'}
+                  onBlur={(e) => e.target.style.borderColor = 'var(--border)'}
+                />
+              </div>
+
               <div style={{ marginBottom: '20px' }}>
                 <label style={{ display: 'block', color: 'var(--text-secondary)', fontSize: '12px', fontWeight: '500', marginBottom: '6px' }}>Nota final</label>
-                <input type="number" min="0" max="10" step="0.1" value={nota}
+                <input type="number" min="0" max="100" step="0.1" value={nota}
                   onChange={(e) => setNota(parseFloat(e.target.value) || '')}
                   disabled={enviando}
                   style={{ ...inp, width: '110px', padding: '9px 12px' }}
@@ -107,18 +131,18 @@ export default function Revisao() {
                 />
               </div>
 
-              {redacao.erros && redacao.erros.length > 0 && (
+              {redacao.correcao?.erros && redacao.correcao.erros.length > 0 && (
                 <div>
                   <h3 style={{ color: 'var(--text-tertiary)', fontSize: '11px', fontWeight: '500', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '12px' }}>Erros encontrados</h3>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                    {redacao.erros.map((error, i) => {
+                    {redacao.correcao.erros.map((error, i) => {
                       const cfg = badgeConfig[error.categoria] || { bg: 'var(--bg-hover)', color: 'var(--text-secondary)', border: 'var(--border)' };
                       return (
                         <div key={i} style={{ padding: '10px 14px', background: 'var(--bg-hover)', borderRadius: '6px', display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap' }}>
                           <span style={{ padding: '2px 8px', borderRadius: '4px', fontSize: '11px', fontWeight: '500', background: cfg.bg, color: cfg.color, flexShrink: 0 }}>{error.categoria}</span>
-                          <span style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{error.erro}</span>
+                          <span style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>{error.textoOriginal}</span>
                           <span style={{ color: 'var(--text-tertiary)', fontSize: '13px' }}>→</span>
-                          <span style={{ color: 'var(--success)', fontSize: '13px' }}>{error.correcao}</span>
+                          <span style={{ color: 'var(--success)', fontSize: '13px' }}>{error.textoCorrigido}</span>
                         </div>
                       );
                     })}
@@ -141,6 +165,7 @@ export default function Revisao() {
             </div>
           </>
         )}
+        </PageTransition>
       </div>
     </div>
   );
