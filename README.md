@@ -44,7 +44,9 @@ The build has passed in the latest reported local check; lint currently has pre-
 
 ## Documentation
 
-See [Portfolio Overview](README_PORTFOLIO.md) for further details on functionality, the backend contract, and verification limitations.
+The backend is available in [CorreX API](https://github.com/thayslancosta/correx-api). The application stores a local session token in `localStorage`; actual authentication and authorization remain the backend's responsibility.
+
+For a backend-free interface demonstration, see the separate [CorreX prototype](https://github.com/thayslancosta/correx-frontend).
 
 ## Collaboration and attribution
 
