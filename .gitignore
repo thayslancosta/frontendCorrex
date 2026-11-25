@@ -22,3 +22,12 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Variáveis de ambiente locais (VITE_* vai para o bundle público; nunca commitar .env)
+.env
+.env.*
+!.env.example
+
+# Repositório da demo pública e pacote zip (não pertencem a este repo)
+correx-frontend-demo/
+correx-frontend-demo.zip
